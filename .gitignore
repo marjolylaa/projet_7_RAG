@@ -8,3 +8,11 @@ wheels/
 
 # Virtual environments
 .venv
+
+.env
+
+# les index faiss
+mon_index_langchain*/
+
+# les datas au format csv
+resources/
