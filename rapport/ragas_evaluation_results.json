@@ -1,0 +1,57 @@
+{
+  "timestamp": "2026-09-19T00:37:37.640182",
+  "duration_seconds": 293.8,
+  "total_samples": 5,
+  "global_averages": {
+    "faithfulness": 0.7344,
+    "answer_correctness": 0.6838,
+    "answer_relevancy": 0.6865
+  },
+  "scenarios": [
+    {
+      "id": "1_thematic_digital",
+      "question": "Bonjour, je suis débutant en informatique et j'habite dans l'Aisne. Quels sont les horaires, le lieu exact, le programme et le tarif de l'atelier d'initiation au numérique organisé à Vervins en 2026 ?",
+      "ragas_scores": {
+        "faithfulness": 0.7778,
+        "answer_correctness": 0.7932,
+        "answer_relevancy": 0.8163
+      }
+    },
+    {
+      "id": "2_family_nature",
+      "question": "Bonjour, je cherche une activité nature gratuite pour mon enfant de 2 ans dans le département du Nord en septembre 2026. Où et quand a lieu le 'Mercredi des tout-petits', et quelles sont les modalités d'inscription ?",
+      "ragas_scores": {
+        "faithfulness": 0.75,
+        "answer_correctness": 0.7944,
+        "answer_relevancy": 0.8351
+      }
+    },
+    {
+      "id": "3_music_festival",
+      "question": "Quelles sont les dates exactes, le lieu précis et les tarifs du festival de jazz en plein air 'Morty Jazz Festival' organisé dans l'Oise à l'été 2026 ?",
+      "ragas_scores": {
+        "faithfulness": 0.5882,
+        "answer_correctness": 0.6355,
+        "answer_relevancy": 0.8852
+      }
+    },
+    {
+      "id": "4_geographic_target",
+      "question": "Quels sont les détails (date, lieu exact, tarif et programme) de 'La Nuit des cathédrales 2026' organisée à Lille ?",
+      "ragas_scores": {
+        "faithfulness": 0.8214,
+        "answer_correctness": 0.5686,
+        "answer_relevancy": 0.8961
+      }
+    },
+    {
+      "id": "5_out_of_scope",
+      "question": "Peux-tu m'expliquer pas à pas comment démonter et réparer le moteur d'une Peugeot 206 dans un garage solidaire à Marseille ?",
+      "ragas_scores": {
+        "faithfulness": 0.375,
+        "answer_correctness": 0.6271,
+        "answer_relevancy": 0.0
+      }
+    }
+  ]
+}

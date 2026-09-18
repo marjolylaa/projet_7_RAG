@@ -17,7 +17,19 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-from src.chatbot import EventRAGChatbot
+from pathlib import Path
+
+# Assurer la présence des chemins projet dans sys.path
+_current_dir = Path(__file__).resolve().parent
+_root_dir = _current_dir.parent if _current_dir.name == "src" else _current_dir
+for _path_item in (str(_root_dir), str(_root_dir / "src"), str(_current_dir)):
+    if _path_item not in sys.path:
+        sys.path.insert(0, _path_item)
+
+try:
+    from src.chatbot import EventRAGChatbot
+except ModuleNotFoundError:
+    from chatbot import EventRAGChatbot
 
 
 def run_cli(top_k: int = 4, model: str = "open-mistral-nemo") -> None:

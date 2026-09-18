@@ -1,0 +1,374 @@
+"""Script de tests fonctionnels et d'intégration pour l'API REST FastAPI.
+
+Ce fichier peut être exécuté directement :
+    uv run python api_test.py
+Ou via pytest :
+    uv run pytest api_test.py
+
+Il valide tous les endpoints requis :
+- GET  /         (Accueil et liens Swagger)
+- GET  /health   (État de santé et statistiques de l'index)
+- GET  /docs     (Documentation interactive Swagger)
+- GET  /openapi.json (Spécification OpenAPI 3.x)
+- POST /ask      (Questions valides, gestion des questions vides 400 et validation 422)
+- POST /rebuild  (Reconstruction / rechargement de la base vectorielle)
+- GET  /rebuild  (Rechargement via méthode GET)
+- Sécurité       (Protection de /rebuild par clé d'administration X-Admin-Key)
+"""
+
+from __future__ import annotations
+
+import os
+import sys
+import time
+from typing import Any, Generator, List, Optional
+
+# Encodage Windows
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
+import pytest
+from fastapi.testclient import TestClient
+from langchain_community.vectorstores import FAISS
+from langchain_core.documents import Document
+from langchain_core.embeddings.fake import FakeEmbeddings
+from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_core.messages import AIMessage, BaseMessage
+from langchain_core.outputs import ChatGeneration, ChatResult
+
+from src.api import app, get_bot
+from src.chatbot import EventRAGChatbot
+
+
+# ============================================================================
+# Doubles de test (Mock deterministe 100% offline pour les tests de l'API)
+# ============================================================================
+
+class MockChatMistralAI(BaseChatModel):
+    """Simulateur de LLM Mistral pour tests d'API sans consommation de crédits."""
+
+    model_name: str = "mock-open-mistral-nemo"
+
+    @property
+    def _llm_type(self) -> str:
+        return "mock-mistral-ai"
+
+    def _generate(
+        self,
+        messages: List[BaseMessage],
+        stop: Optional[List[str]] = None,
+        run_manager: Any = None,
+        **kwargs: Any,
+    ) -> ChatResult:
+        user_prompt = ""
+        for m in reversed(messages):
+            if getattr(m, "type", "") == "human" or getattr(m, "role", "") == "user":
+                user_prompt = str(m.content)
+                break
+        if not user_prompt and messages:
+            user_prompt = str(messages[-1].content)
+
+        reply = (
+            f"En réponse à votre question « {user_prompt} », nous vous recommandons "
+            "le Morty Jazz Festival à Mortefontaine qui se tiendra en juillet 2026. "
+            "Cet événement en plein air est gratuit et accessible à tous."
+        )
+
+        return ChatResult(
+            generations=[
+                ChatGeneration(message=AIMessage(content=reply))
+            ]
+        )
+
+
+def build_test_chatbot() -> EventRAGChatbot:
+    """Crée une instance de chatbot autonome et légère dédiée aux tests fonctionnels de l'API."""
+    docs = [
+        Document(
+            page_content="Morty Jazz Festival à Mortefontaine dans le sud de l'Oise. Festival de jazz en plein air.",
+            metadata={
+                "Titre": "Morty Jazz Festival",
+                "Ville": "Mortefontaine",
+                "URL canonique": "https://openagenda.com/events/morty-jazz-2026",
+                "Première date - Début": "2026-07-24T18:00:00",
+                "Dernière date - Fin": "2026-07-25T23:30:00",
+                "Conditions d'accès": "Gratuit en plein air",
+            },
+        ),
+        Document(
+            page_content="Atelier numérique pour débutants à Vervins. Initiation aux outils informatiques.",
+            metadata={
+                "Titre": "Les RDV numériques du vendredi",
+                "Ville": "Vervins",
+                "URL canonique": "https://openagenda.com/events/rdv-numeriques-vervins-2026",
+                "Première date - Début": "2026-05-22T14:00:00",
+                "Dernière date - Fin": "2026-07-24T16:00:00",
+                "Conditions d'accès": "5 € la séance",
+            },
+        ),
+    ]
+    embeddings = FakeEmbeddings(size=32)
+    vectorstore = FAISS.from_documents(docs, embeddings)
+
+    # Initialisation de l'objet métier sans réseau
+    os.environ.setdefault("MISTRAL_API_KEY", "mock_key_for_testing")
+    bot = EventRAGChatbot(
+        vectorstore=vectorstore,
+        llm=MockChatMistralAI(),
+        embeddings=embeddings,
+        top_k=2,
+    )
+    return bot
+
+
+# ============================================================================
+# Fixture de Client de Test
+# ============================================================================
+
+@pytest.fixture(scope="module")
+def client() -> Generator[TestClient, None, None]:
+    """Fournit un TestClient FastAPI configuré avec le bot de test."""
+    test_bot = build_test_chatbot()
+    app.dependency_overrides[get_bot] = lambda: test_bot
+
+    with TestClient(app) as tc:
+        yield tc
+
+    app.dependency_overrides.clear()
+
+
+# ============================================================================
+# Tests des Endpoints
+# ============================================================================
+
+def test_root_endpoint(client: TestClient) -> None:
+    """Vérifie que la racine GET / sert l'interface Web HTML (ou JSON si demandé avec Accept: application/json)."""
+    # 1. Vérification que la racine GET / renvoie bien l'UI HTML pour le navigateur
+    response = client.get("/")
+    assert response.status_code == 200, f"Erreur statut {response.status_code}: {response.text}"
+    assert "text/html" in response.headers.get("content-type", "")
+    assert "<!DOCTYPE html>" in response.text or "<html" in response.text
+    assert "Hauts-de-France" in response.text
+
+    # 2. Vérification du fallback JSON avec en-tête Accept: application/json
+    json_response = client.get("/", headers={"accept": "application/json"})
+    assert json_response.status_code == 200
+    data = json_response.json()
+    assert "documentation_swagger" in data
+    assert data["documentation_swagger"] == "/docs"
+    assert "interface_web" in data
+    assert "total_documents" in data
+    assert data["status"] == "online"
+
+
+def test_ui_endpoint(client: TestClient) -> None:
+    """Vérifie que GET /ui renvoie l'interface graphique HTML avec succès."""
+    response = client.get("/ui")
+    assert response.status_code == 200
+    assert "text/html" in response.headers.get("content-type", "")
+    assert "<!DOCTYPE html>" in response.text or "<html" in response.text
+    assert "Hauts-de-France" in response.text
+    assert "openSettingsBtn" in response.text
+
+
+def test_health_endpoint(client: TestClient) -> None:
+    """Vérifie que GET /health renvoie l'état healthy et les métadonnées."""
+    response = client.get("/health")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "healthy"
+    assert data["total_documents"] >= 2
+    assert "llm_model" in data
+    assert data["documentation_url"] == "/docs"
+
+
+def test_swagger_documentation(client: TestClient) -> None:
+    """Vérifie que la documentation Swagger UI (/docs) et OpenAPI (/openapi.json) sont accessibles."""
+    # Test Swagger UI
+    docs_resp = client.get("/docs")
+    assert docs_resp.status_code == 200
+    assert "swagger" in docs_resp.text.lower() or "html" in docs_resp.text.lower()
+
+    # Test OpenAPI JSON schema
+    openapi_resp = client.get("/openapi.json")
+    assert openapi_resp.status_code == 200
+    schema = openapi_resp.json()
+    assert "openapi" in schema
+    assert "/ask" in schema["paths"]
+    assert "/rebuild" in schema["paths"]
+    assert "/health" in schema["paths"]
+    assert "/ui" in schema["paths"]
+
+
+def test_ask_valid_question(client: TestClient) -> None:
+    """Vérifie que POST /ask traite une question valide et renvoie la réponse augmentée."""
+    payload = {
+        "question": "Où assister à un festival de jazz en plein air en juillet ?",
+        "top_k": 2,
+    }
+    response = client.post("/ask", json=payload)
+    assert response.status_code == 200, f"Erreur statut {response.status_code}: {response.text}"
+    data = response.json()
+
+    assert data["question"] == payload["question"]
+    assert "Morty Jazz Festival" in data["answer"]
+    assert "2026" in data["answer"]
+    assert isinstance(data["sources"], list)
+    assert len(data["sources"]) > 0
+    assert data["total_sources"] == len(data["sources"])
+    assert "latency_seconds" in data
+    assert data["latency_seconds"] >= 0.0
+
+    # Vérification des métadonnées de la première source
+    first_source = data["sources"][0]
+    assert "titre" in first_source
+    assert "ville" in first_source
+    assert "score_distance" in first_source
+    assert "url" in first_source
+
+
+def test_ask_empty_question_returns_400(client: TestClient) -> None:
+    """Vérifie qu'une question vide ou composée uniquement d'espaces renvoie HTTP 400."""
+    # Chaîne avec espaces uniquement
+    response = client.post("/ask", json={"question": "   "})
+    assert response.status_code == 400
+    detail = response.json().get("detail", "")
+    assert "vide" in detail.lower()
+
+    # Chaîne vide directe
+    response_empty = client.post("/ask", json={"question": ""})
+    # Selon la validation Pydantic min_length=1 ou validation métier, 400 ou 422
+    assert response_empty.status_code in (400, 422)
+
+
+def test_ask_invalid_payload_returns_422(client: TestClient) -> None:
+    """Vérifie qu'un payload sans le champ obligatoire 'question' renvoie HTTP 422."""
+    response = client.post("/ask", json={})
+    assert response.status_code == 422
+
+    # Test avec top_k négatif ou hors limites (ge=1, le=20)
+    response_invalid_k = client.post("/ask", json={"question": "Bonjour", "top_k": 999})
+    assert response_invalid_k.status_code == 422
+
+
+def test_rebuild_post_endpoint(client: TestClient) -> None:
+    """Vérifie que POST /rebuild recharge la base vectorielle avec succès."""
+    response = client.post("/rebuild", json={"index_type": None})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert "rechargée" in data["message"].lower() or "succès" in data["message"].lower()
+    assert data["total_documents"] >= 2
+    assert "timestamp" in data
+
+
+def test_rebuild_get_endpoint(client: TestClient) -> None:
+    """Vérifie que GET /rebuild permet également de recharger la base."""
+    response = client.get("/rebuild")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert data["total_documents"] >= 2
+
+
+def test_rebuild_security_protection(client: TestClient) -> None:
+    """Vérifie la protection de l'endpoint /rebuild lorsqu'une clé ADMIN_API_KEY est configurée."""
+    env_backup = os.environ.get("ADMIN_API_KEY")
+    try:
+        # Activation d'une clé d'administration secrète
+        os.environ["ADMIN_API_KEY"] = "cle_secrete_admin_2026"
+
+        # 1. Requête sans header -> doit être refusée avec HTTP 403
+        resp_unauth = client.post("/rebuild", json={})
+        assert resp_unauth.status_code == 403
+        assert "refusé" in resp_unauth.json().get("detail", "").lower()
+
+        # 2. Requête avec mauvaise clé -> doit être refusée avec HTTP 403
+        resp_wrong = client.post(
+            "/rebuild",
+            json={},
+            headers={"X-Admin-Key": "mauvaise_cle"},
+        )
+        assert resp_wrong.status_code == 403
+
+        # 3. Requête avec la bonne clé -> doit réussir avec HTTP 200
+        resp_ok = client.post(
+            "/rebuild",
+            json={},
+            headers={"X-Admin-Key": "cle_secrete_admin_2026"},
+        )
+        assert resp_ok.status_code == 200
+        assert resp_ok.json()["status"] == "success"
+
+    finally:
+        # Nettoyage et restauration de l'environnement
+        if env_backup is not None:
+            os.environ["ADMIN_API_KEY"] = env_backup
+        else:
+            os.environ.pop("ADMIN_API_KEY", None)
+
+
+# ============================================================================
+# Exécution Directe (Script CLI)
+# ============================================================================
+
+def run_functional_test_suite() -> bool:
+    """Exécute la suite de tests fonctionnels et affiche un compte-rendu élégant."""
+    print("=" * 80)
+    print("🧪 EXÉCUTION DES TESTS FONCTIONNELS DE L'API REST (FastAPI)")
+    print("=" * 80)
+
+    test_bot = build_test_chatbot()
+    app.dependency_overrides[get_bot] = lambda: test_bot
+
+    tests = [
+        ("GET  / (Racine & Liens)", test_root_endpoint),
+        ("GET  /ui (Interface Web Graphique)", test_ui_endpoint),
+        ("GET  /health (Santé & Métadonnées)", test_health_endpoint),
+        ("GET  /docs & /openapi.json (Swagger UI)", test_swagger_documentation),
+        ("POST /ask (Question valide & Recommandation)", test_ask_valid_question),
+        ("POST /ask (Gestion des questions vides - 400)", test_ask_empty_question_returns_400),
+        ("POST /ask (Validation de schéma - 422)", test_ask_invalid_payload_returns_422),
+        ("POST /rebuild (Rechargement base vectorielle)", test_rebuild_post_endpoint),
+        ("GET  /rebuild (Rechargement via GET)", test_rebuild_get_endpoint),
+        ("SÉCURITÉ /rebuild (Vérification X-Admin-Key 403)", test_rebuild_security_protection),
+    ]
+
+    success_count = 0
+    start_total = time.perf_counter()
+
+    with TestClient(app) as tc:
+        for name, test_fn in tests:
+            t0 = time.perf_counter()
+            try:
+                test_fn(tc)
+                elapsed = (time.perf_counter() - t0) * 1000
+                print(f"  ✅ PASS [{elapsed:5.1f} ms] : {name}")
+                success_count += 1
+            except Exception as exc:
+                elapsed = (time.perf_counter() - t0) * 1000
+                print(f"  ❌ FAIL [{elapsed:5.1f} ms] : {name}")
+                print(f"     👉 Détail : {exc}")
+
+    app.dependency_overrides.clear()
+    total_time = time.perf_counter() - start_total
+
+    print("=" * 80)
+    print(f"📊 RÉSULTAT : {success_count}/{len(tests)} tests réussis en {total_time:.3f} s.")
+    if success_count == len(tests):
+        print("🎉 TOUS LES TESTS DE L'API ONT RÉUSSI AVEC SUCCÈS !")
+        print("=" * 80)
+        return True
+    else:
+        print("⚠️ CERTAINS TESTS ONT ÉCHOUÉ !")
+        print("=" * 80)
+        return False
+
+
+if __name__ == "__main__":
+    success = run_functional_test_suite()
+    sys.exit(0 if success else 1)

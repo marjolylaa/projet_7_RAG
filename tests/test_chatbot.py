@@ -237,7 +237,9 @@ def test_ask_thematic_query(bot):
     assert isinstance(res, dict)
     assert "answer" in res
     assert "sources" in res
+    assert "contexts" in res
     assert len(res["sources"]) > 0
+    assert len(res["contexts"]) == len(res["sources"])
 
     answer = res["answer"]
     assert len(answer) > 50

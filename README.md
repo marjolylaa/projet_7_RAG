@@ -53,23 +53,53 @@ uv run python main.py --inspect
 uv run python main.py --inspect --keyword jazz
 ```
 
-### 3. Évaluer les scénarios d'interaction RAG (Vérité terrain & Rapport HTML)
-Pour exécuter la suite de 5 scénarios de test et les comparer aux **réponses de référence annotées par l'humain** (calcul de l'Exact Match factuel, similarité lexicale F1, classification qualitative et génération du rapport HTML avec horodatage d'exécution) :
+### 3. Lancer l'Interface Graphique Web (Très légère)
+Pour interagir visuellement avec le chatbot et tester les recommandations en direct dans le navigateur :
+```bash
+uv run python main.py --ui
+```
+Cette commande démarre le serveur et ouvre automatiquement votre navigateur sur **[http://127.0.0.1:8000](http://127.0.0.1:8000)** (disponible directement à la racine et sur `/ui`).
+- 💬 **Conversation fluide & interactive** : suggestions en 1 clic, saisie libre, sélecteur de Top-K.
+- 📚 **Sources FAISS détaillées** : cartes déroulantes pour chaque recommandation (titre, ville, score distance, lien OpenAgenda).
+- ⏱️ **Indicateurs de performance** : mesure de la latence en secondes et statut en direct de l'API.
+- ⚙️ **Administration intégrée** : bouton *Rebuild* protégé par confirmation pour recharger ou basculer l'index à chaud.
+
+### 4. Lancer l'API REST FastAPI
+Pour lancer uniquement le serveur d'API (sans ouvrir automatiquement le navigateur) :
+```bash
+uv run python main.py --serve
+# ou avec rechargement à chaud : uv run uvicorn src.api:app --reload --port 8000
+```
+- **Interface Graphique Web** : [http://127.0.0.1:8000](http://127.0.0.1:8000) (ou `/ui`)
+- **Documentation interactive Swagger UI** : [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **Documentation ReDoc** : [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
+- **Santé & Métadonnées** : `GET http://127.0.0.1:8000/health`
+- **Poser une question** : `POST http://127.0.0.1:8000/ask` (body : `{"question": "...", "top_k": 4}`)
+- **Recharger / Reconstruire l'index** : `POST http://127.0.0.1:8000/rebuild` ou `GET http://127.0.0.1:8000/rebuild`
+  *(Protégé par pop-up de confirmation dans l'UI et header `X-Admin-Key` si `ADMIN_API_KEY` est configuré)*
+
+### 5. Exécuter les tests fonctionnels de l'API
+Pour valider l'ensemble des endpoints HTTP, l'interface graphique à la racine `/` et `/ui`, les codes d'erreurs (400, 422, 403), et Swagger :
+```bash
+uv run python api_test.py
+```
+
+### 6. Évaluer les scénarios d'interaction RAG (Vérité terrain & Rapport HTML)
+Pour exécuter la suite de 5 scénarios de test et les comparer aux **réponses de référence annotées par l'humain** :
 ```bash
 uv run python src/evaluer_scenarios.py
 # ou : uv run python main.py --eval
 # génère par défaut : rapport/rapport_evaluation.html
-# avec chemin personnalisé : uv run python src/evaluer_scenarios.py --output rapport/mon_rapport.html
 ```
 
-### 4. Mode console de test (CLI isolé)
+### 7. Mode console de test (CLI isolé)
 Pour échanger avec le bot directement dans le terminal (outil de test) :
 ```bash
 uv run python src/cli.py
 # ou : uv run python main.py --cli
 ```
 
-### 5. Exécuter les tests automatisés
+### 8. Exécuter l'ensemble des tests automatisés
 ```bash
 uv run pytest
 ```
@@ -92,18 +122,23 @@ projet_7_systeme_RAG/
 │   └── rapport_evaluation.html
 ├── resources/                                      # Données brutes CSV
 ├── src/
-│   ├── chatbot.py                                  # Moteur RAG métier (classe EventRAGChatbot pour GUI/API)
+│   ├── api.py                                      # API REST FastAPI (/ask, /rebuild, /docs)
+│   ├── chatbot.py                                  # Moteur RAG métier (classe EventRAGChatbot)
 │   ├── cli.py                                      # Interface console de test isolée
-│   ├── evaluer_scenarios.py                       # Démonstration sur 5 scénarios
+│   ├── evaluer_scenarios.py                       # Démonstration sur 5 scénarios & rapport HTML
 │   ├── inspect_index.py                            # Inspection locale hors-ligne (0 crédit)
 │   ├── recuperation_data_et_vectorisation.ipynb   # Notebook de préparation et benchmarks
+│   ├── static/
+│   │   └── index.html                              # Interface Web graphique interactive
 │   ├── mon_index_langchain_evenements/             # Index FAISS Flat L2
 │   ├── mon_index_langchain_evenements_hnsw_rapide/ # Index FAISS HNSW optimisé
-│   └── .env                                        # Clé API Mistral
+│   └── .env                                        # Clé API Mistral (non versionné)
 ├── tests/
 │   ├── conftest.py
-│   └── test_chatbot.py                             # Tests unitaires et d'intégration
-├── main.py                                         # Point d'orchestration et vérification d'état
+│   ├── test_api.py                                 # Tests d'intégration API REST
+│   └── test_chatbot.py                             # Tests unitaires et RAG (100% offline)
+├── api_test.py                                     # Script de test fonctionnel autonome de l'API
+├── main.py                                         # Point d'orchestration (CLI, Serveur, Audit)
 ├── pyproject.toml
 ├── uv.lock
 └── README.md

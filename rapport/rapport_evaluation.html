@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rapport d'Évaluation RAG - 16/09/2026 à 23:00:49</title>
+    <title>Rapport d'Évaluation Ragas - 19/09/2026 à 00:32:11</title>
     <style>
         :root {
             --primary: #1e40af;
@@ -20,6 +20,8 @@
             --warning-bg: #fef3c7;
             --danger: #b91c1c;
             --danger-bg: #fee2e2;
+            --purple: #7c3aed;
+            --purple-bg: #f3e8ff;
             --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
 
@@ -38,11 +40,10 @@
         }
 
         .container {
-            max-width: 1180px;
+            max-width: 1240px;
             margin: 0 auto;
         }
 
-        /* Header Hero */
         .header-card {
             background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
             color: white;
@@ -53,8 +54,8 @@
         }
 
         .header-title {
-            font-size: 1.95rem;
-            font-weight: 700;
+            font-size: 2rem;
+            font-weight: 800;
             letter-spacing: -0.02em;
             margin-bottom: 0.5rem;
         }
@@ -88,10 +89,9 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
 
-        /* KPI Grid */
         .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1.25rem;
             margin-bottom: 2rem;
         }
@@ -111,7 +111,7 @@
         }
 
         .kpi-label {
-            font-size: 0.82rem;
+            font-size: 0.80rem;
             text-transform: uppercase;
             letter-spacing: 0.06em;
             color: var(--text-muted);
@@ -126,12 +126,11 @@
         }
 
         .kpi-subtext {
-            font-size: 0.82rem;
+            font-size: 0.80rem;
             color: var(--text-muted);
             margin-top: 0.25rem;
         }
 
-        /* Section Card */
         .section-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
@@ -158,11 +157,11 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.93rem;
+            font-size: 0.92rem;
         }
 
         th, td {
-            padding: 0.85rem 1rem;
+            padding: 0.85rem 0.9rem;
             text-align: left;
             border-bottom: 1px solid var(--border);
         }
@@ -170,7 +169,7 @@
         th {
             background-color: var(--accent);
             color: var(--primary);
-            font-weight: 600;
+            font-weight: 700;
         }
 
         tr:last-child td {
@@ -181,7 +180,6 @@
             background-color: #f8fafc;
         }
 
-        /* Badges */
         .badge {
             display: inline-block;
             padding: 0.3rem 0.75rem;
@@ -207,88 +205,114 @@
         }
 
         .badge-source {
-            background: #e0f2fe;
-            color: #0369a1;
+            background: #f1f5f9;
+            color: #475569;
         }
 
         .badge-ville {
-            background: #f1f5f9;
-            color: #334155;
-            font-weight: 500;
-        }
-
-        .badge-latency {
-            background: #fef3c7;
-            color: #92400e;
-            padding: 0.3rem 0.75rem;
-            border-radius: 6px;
-            font-size: 0.85rem;
+            background: #e0f2fe;
+            color: #0369a1;
             font-weight: 600;
         }
 
-        /* Scenario Cards */
+        .badge-latency {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            color: #64748b;
+        }
+
+        .ragas-tag {
+            background: var(--purple-bg);
+            color: var(--purple);
+            font-weight: 700;
+            padding: 0.2rem 0.55rem;
+            border-radius: 6px;
+            font-size: 0.82rem;
+        }
+
         .scenario-card {
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 12px;
-            margin-bottom: 2.25rem;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            margin-bottom: 2rem;
             overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
         }
 
         .scenario-header {
-            background: #f8fafc;
+            background: #fafbfc;
             border-bottom: 1px solid var(--border);
-            padding: 1.25rem 1.75rem;
+            padding: 1.25rem 1.5rem;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
+            align-items: flex-start;
             gap: 1rem;
+        }
+
+        .scenario-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.35rem;
+        }
+
+        .scenario-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .scenario-desc {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
         }
 
         .scenario-header-actions {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-        }
-
-        .scenario-badge {
-            display: inline-block;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: var(--primary);
-            letter-spacing: 0.05em;
-            margin-bottom: 0.25rem;
-        }
-
-        .scenario-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .scenario-desc {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-top: 0.2rem;
+            gap: 0.5rem;
+            flex-shrink: 0;
         }
 
         .scenario-body {
-            padding: 1.75rem;
+            padding: 1.5rem;
         }
 
-        /* Chat Bubbles & Comparison Grid */
         .chat-bubble {
             border-radius: 10px;
-            padding: 1.15rem 1.35rem;
+            padding: 1rem 1.25rem;
             margin-bottom: 1.25rem;
+        }
+
+        .bubble-header {
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.5rem;
         }
 
         .user-bubble {
             background: #f1f5f9;
             border-left: 4px solid #64748b;
+        }
+
+        .user-bubble .bubble-header {
+            color: #475569;
+        }
+
+        .user-bubble .bubble-content {
+            font-size: 1.02rem;
+            font-weight: 500;
+            color: #1e293b;
+            font-style: italic;
         }
 
         .comparison-grid {
@@ -305,42 +329,44 @@
         }
 
         .ref-bubble {
-            background: #f0fdf4;
-            border-left: 4px solid var(--success);
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid #0284c7;
             border-radius: 10px;
-            padding: 1.15rem 1.35rem;
+            padding: 1.25rem;
+        }
+
+        .ref-bubble .bubble-header {
+            color: #0369a1;
+        }
+
+        .ref-bubble .bubble-content {
+            font-size: 0.92rem;
+            color: #334155;
         }
 
         .bot-bubble {
             background: #eff6ff;
-            border-left: 4px solid #3b82f6;
+            border: 1px solid #bfdbfe;
+            border-left: 4px solid #2563eb;
             border-radius: 10px;
-            padding: 1.15rem 1.35rem;
+            padding: 1.25rem;
         }
 
-        .bubble-header {
-            font-size: 0.78rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.5rem;
+        .bot-bubble .bubble-header {
+            color: #1d4ed8;
         }
 
-        .user-bubble .bubble-header { color: #475569; }
-        .ref-bubble .bubble-header { color: #15803d; }
-        .bot-bubble .bubble-header { color: var(--primary); }
-
-        .bubble-content {
-            font-size: 0.95rem;
-            color: var(--text-main);
+        .bot-bubble .bubble-content {
+            font-size: 0.92rem;
+            color: #1e293b;
         }
 
-        /* Evaluation Breakdown Card */
         .eval-card {
-            background: #f8fafc;
+            background: #fcfcfc;
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 1.25rem 1.5rem;
+            padding: 1.25rem;
             margin-bottom: 1.25rem;
         }
 
@@ -350,72 +376,97 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 0.75rem;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
         }
 
         .eval-metrics-pills {
             display: flex;
-            gap: 0.75rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
 
         .metric-pill {
-            background: #ffffff;
-            border: 1px solid var(--border);
-            padding: 0.3rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.82rem;
+            background: #e2e8f0;
             color: #334155;
+            padding: 0.25rem 0.65rem;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 500;
+        }
+
+        .metric-pill strong {
+            color: #0f172a;
+        }
+
+        .ragas-pill {
+            background: var(--purple-bg);
+            color: var(--purple);
+        }
+
+        .ragas-pill strong {
+            color: var(--purple);
         }
 
         .eval-justif {
-            color: var(--text-muted);
             font-size: 0.88rem;
-            margin-bottom: 0.75rem;
+            color: #475569;
         }
 
-        .criteria-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 0.5rem;
+        .eval-accordion {
+            background: #faf5ff;
+            border: 1px solid #e9d5ff;
+            border-radius: 10px;
+            margin-bottom: 1.25rem;
+            overflow: hidden;
         }
 
-        .criteria-item {
-            background: #ffffff;
-            border: 1px solid var(--border);
-            padding: 0.45rem 0.75rem;
-            border-radius: 6px;
-            font-size: 0.84rem;
+        .eval-summary {
+            background: #f3e8ff;
+            color: #6b21a8;
+            font-weight: 700;
+            padding: 0.85rem 1.25rem;
+            cursor: pointer;
+            font-size: 0.92rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            user-select: none;
         }
 
-        .criteria-item.valid {
-            border-left: 3px solid var(--success);
-            color: #14532d;
+        .eval-summary:hover {
+            background: #ebd5ff;
         }
 
-        .criteria-item.invalid {
-            border-left: 3px solid var(--danger);
-            color: #7f1d1d;
+        .eval-accordion-content {
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
         }
 
-        .matched-term {
-            color: #047857;
-            font-weight: 600;
+        .metric-explain-box {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #7c3aed;
+            border-radius: 8px;
+            padding: 0.85rem 1.1rem;
         }
 
-        .missing-term {
-            color: #dc2626;
-            font-style: italic;
+        .metric-explain-box strong {
+            color: #1e293b;
+            font-size: 0.92rem;
+            display: block;
+            margin-bottom: 0.25rem;
         }
 
-        /* Sources Accordion & Tables */
+        .metric-explain-box p {
+            color: #475569;
+            font-size: 0.87rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+
         .sources-accordion {
-            background: #fafafa;
+            background: #f8fafc;
             border: 1px solid var(--border);
             border-radius: 8px;
             padding: 0.85rem 1.25rem;
@@ -455,53 +506,62 @@
 </head>
 <body>
     <div class="container">
-        <!-- En-tête avec Date d'Exécution bien visible -->
         <header class="header-card">
-            <h1 class="header-title">🏛️ Rapport d'Évaluation - Chatbot RAG</h1>
-            <p class="header-subtitle">Banc d'essai de validation qualitative et quantitative par rapport aux réponses annotées par l'humain</p>
+            <h1 class="header-title">🏛️ Rapport d'Évaluation Ragas - Chatbot RAG</h1>
+            <p class="header-subtitle">Banc d'essai de validation rigoureuse et automatisée à 100 % par le framework Ragas (Mistral AI + FAISS HNSW)</p>
             <div class="meta-tags">
-                <span class="meta-tag highlight-date">📅 Date d'exécution : 16/09/2026 à 23:00:49</span>
-                <span class="meta-tag">⏱️ Durée totale : 80.19 s</span>
+                <span class="meta-tag highlight-date">📅 Date d'exécution : 19/09/2026 à 00:32:11</span>
+                <span class="meta-tag">⏱️ Durée totale : 326.18 s</span>
                 <span class="meta-tag">🤖 Modèle : open-mistral-nemo</span>
                 <span class="meta-tag">🗄️ VectorStore : FAISS HNSW</span>
+                <span class="meta-tag">🔬 Juge : Ragas 0.4 (Claims &amp; Semantic)</span>
             </div>
         </header>
 
-        <!-- Grille des KPI -->
         <div class="kpi-grid">
             <div class="kpi-card">
                 <div class="kpi-label">Scénarios Évalués</div>
                 <div class="kpi-value">5 / 5</div>
-                <div class="kpi-subtext">5 cas représentatifs testés</div>
+                <div class="kpi-subtext">5 questions très précises</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-label">Taux de Réponses Correctes</div>
+                <div class="kpi-label">Taux de Conformité</div>
                 <div class="kpi-value" style="color: var(--success);">100%</div>
                 <div class="kpi-subtext">5 Correctes, 0 Partielles, 0 Incorrectes</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-label">Exact Match Moyen</div>
-                <div class="kpi-value">100%</div>
-                <div class="kpi-subtext">Couverture des critères factuels clés</div>
+                <div class="kpi-label">Ragas Correctness Moyen</div>
+                <div class="kpi-value" style="color: var(--purple);">68.4%</div>
+                <div class="kpi-subtext">Justesse factuelle vs vérité terrain</div>
             </div>
             <div class="kpi-card">
-                <div class="kpi-label">Similarité Moyenne (F1)</div>
-                <div class="kpi-value">18.4%</div>
-                <div class="kpi-subtext">Par rapport aux références humaines</div>
+                <div class="kpi-label">Ragas Faithfulness Moyen</div>
+                <div class="kpi-value" style="color: var(--purple);">73.4%</div>
+                <div class="kpi-subtext">Fidélité au contexte documentaire</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Ragas Relevancy Moyen</div>
+                <div class="kpi-value" style="color: var(--purple);">68.7%</div>
+                <div class="kpi-subtext">Pertinence directe de réponse</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Latence Moyenne</div>
+                <div class="kpi-value">5.48 s</div>
+                <div class="kpi-subtext">Par scénario interactif</div>
             </div>
         </div>
 
-        <!-- Tableau synthétique -->
         <section class="section-card">
-            <h2 class="section-title">📊 Synthèse de l'Évaluation vs Vérité Terrain</h2>
+            <h2 class="section-title">📊 Synthèse de l'Évaluation 100% Ragas</h2>
             <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Scénario testé</th>
-                            <th>Exact Match (Faits)</th>
-                            <th>Similarité F1</th>
+                            <th>Correctness</th>
+                            <th>Faithfulness</th>
+                            <th>Relevancy</th>
                             <th>Classification</th>
                             <th>Latence</th>
                             <th>Sources</th>
@@ -509,886 +569,997 @@
                     </thead>
                     <tbody>
                         
-        <tr>
-            <td><strong>#1_thematic_digital</strong></td>
-            <td><a href="#scenario-1_thematic_digital" style="color: #1d4ed8; text-decoration: none; font-weight: 500;">Recherche thématique ciblée (Atelier numérique)</a></td>
-            <td><strong>100%</strong></td>
-            <td>18.8%</td>
-            <td><span class="badge badge-success">Correcte</span></td>
-            <td>15.23 s</td>
-            <td><span class="badge badge-source">4 docs</span></td>
-        </tr>
-        
-
-        <tr>
-            <td><strong>#2_family_nature</strong></td>
-            <td><a href="#scenario-2_family_nature" style="color: #1d4ed8; text-decoration: none; font-weight: 500;">Recommandation familiale (Sortie nature avec enfants)</a></td>
-            <td><strong>100%</strong></td>
-            <td>11.2%</td>
-            <td><span class="badge badge-success">Correcte</span></td>
-            <td>21.25 s</td>
-            <td><span class="badge badge-source">4 docs</span></td>
-        </tr>
-        
-
-        <tr>
-            <td><strong>#3_music_festival</strong></td>
-            <td><a href="#scenario-3_music_festival" style="color: #1d4ed8; text-decoration: none; font-weight: 500;">Recherche musicale / festive (Concert &amp; Jazz)</a></td>
-            <td><strong>100%</strong></td>
-            <td>13.6%</td>
-            <td><span class="badge badge-success">Correcte</span></td>
-            <td>21.89 s</td>
-            <td><span class="badge badge-source">4 docs</span></td>
-        </tr>
-        
-
-        <tr>
-            <td><strong>#4_geographic_target</strong></td>
-            <td><a href="#scenario-4_geographic_target" style="color: #1d4ed8; text-decoration: none; font-weight: 500;">Recherche géographique spécifique (Lille &amp; Oise)</a></td>
-            <td><strong>100%</strong></td>
-            <td>9.6%</td>
-            <td><span class="badge badge-success">Correcte</span></td>
-            <td>14.32 s</td>
-            <td><span class="badge badge-source">4 docs</span></td>
-        </tr>
-        
-
-        <tr>
-            <td><strong>#5_out_of_scope</strong></td>
-            <td><a href="#scenario-5_out_of_scope" style="color: #1d4ed8; text-decoration: none; font-weight: 500;">Cas limite / Hors périmètre (Anti-hallucination)</a></td>
-            <td><strong>100%</strong></td>
-            <td>39.0%</td>
-            <td><span class="badge badge-success">Correcte</span></td>
-            <td>2.76 s</td>
-            <td><span class="badge badge-source">1 docs</span></td>
-        </tr>
-        
+                        <tr>
+                            <td><strong>#1_thematic_digital</strong></td>
+                            <td><a href="#scenario-1_thematic_digital" style="color: #1d4ed8; text-decoration: none; font-weight: 600;">Recherche thématique ciblée (Atelier numérique débutant)</a></td>
+                            <td><span class="ragas-tag">79.3%</span></td>
+                            <td><span class="ragas-tag">77.8%</span></td>
+                            <td><span class="ragas-tag">81.6%</span></td>
+                            <td><span class="badge badge-success">Correcte</span></td>
+                            <td>7.26 s</td>
+                            <td><span class="badge badge-source">4 docs</span></td>
+                        </tr>
+                        
+                        <tr>
+                            <td><strong>#2_family_nature</strong></td>
+                            <td><a href="#scenario-2_family_nature" style="color: #1d4ed8; text-decoration: none; font-weight: 600;">Recommandation familiale (Éveil nature tout-petits)</a></td>
+                            <td><span class="ragas-tag">79.4%</span></td>
+                            <td><span class="ragas-tag">75.0%</span></td>
+                            <td><span class="ragas-tag">83.5%</span></td>
+                            <td><span class="badge badge-success">Correcte</span></td>
+                            <td>6.91 s</td>
+                            <td><span class="badge badge-source">4 docs</span></td>
+                        </tr>
+                        
+                        <tr>
+                            <td><strong>#3_music_festival</strong></td>
+                            <td><a href="#scenario-3_music_festival" style="color: #1d4ed8; text-decoration: none; font-weight: 600;">Recherche musicale festive (Concert jazz plein air)</a></td>
+                            <td><span class="ragas-tag">63.5%</span></td>
+                            <td><span class="ragas-tag">58.8%</span></td>
+                            <td><span class="ragas-tag">88.5%</span></td>
+                            <td><span class="badge badge-success">Correcte</span></td>
+                            <td>5.33 s</td>
+                            <td><span class="badge badge-source">4 docs</span></td>
+                        </tr>
+                        
+                        <tr>
+                            <td><strong>#4_geographic_target</strong></td>
+                            <td><a href="#scenario-4_geographic_target" style="color: #1d4ed8; text-decoration: none; font-weight: 600;">Recherche patrimoniale ciblée (La Nuit des cathédrales à Lille)</a></td>
+                            <td><span class="ragas-tag">56.9%</span></td>
+                            <td><span class="ragas-tag">82.1%</span></td>
+                            <td><span class="ragas-tag">89.6%</span></td>
+                            <td><span class="badge badge-success">Correcte</span></td>
+                            <td>6.05 s</td>
+                            <td><span class="badge badge-source">4 docs</span></td>
+                        </tr>
+                        
+                        <tr>
+                            <td><strong>#5_out_of_scope</strong></td>
+                            <td><a href="#scenario-5_out_of_scope" style="color: #1d4ed8; text-decoration: none; font-weight: 600;">Cas limite / Hors périmètre (Anti-hallucination & Rebond)</a></td>
+                            <td><span class="ragas-tag">62.7%</span></td>
+                            <td><span class="ragas-tag">N/A*</span></td>
+                            <td><span class="ragas-tag">0.0%</span></td>
+                            <td><span class="badge badge-success">Correcte</span></td>
+                            <td>1.84 s</td>
+                            <td><span class="badge badge-source">4 docs</span></td>
+                        </tr>
+                        
                     </tbody>
                 </table>
             </div>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.75rem;">
+                * <em>Note : Pour les requêtes hors périmètre (refus poli et cadré), la fidélité documentaire (Faithfulness) est N/A car aucune source documentaire n'est invoquée. Le score moyen de Faithfulness est calculé sur l'ensemble des scénarios dans le périmètre documentaire.</em>
+            </p>
         </section>
 
-        <!-- Fiches détaillées des scénarios -->
         <section>
             <h2 class="section-title" style="margin-bottom: 1.5rem;">📝 Analyse Détaillée par Scénario</h2>
             
-        <div class="scenario-card" id="scenario-1_thematic_digital">
-            <div class="scenario-header">
-                <div>
-                    <span class="scenario-badge">Scénario 1_thematic_digital</span>
-                    <h3 class="scenario-title">Recherche thématique ciblée (Atelier numérique)</h3>
-                    <p class="scenario-desc">🎯 <strong>Objectif :</strong> Vérifie la capacité à recommander des formations ou ateliers d&#x27;initiation pertinents.</p>
-                </div>
-                <div class="scenario-header-actions">
-                    <span class="badge badge-success" style="font-size: 0.9rem; padding: 0.4rem 0.85rem;">
-                        Correcte
-                    </span>
-                    <span class="badge badge-latency">⏱️ 15.23 s</span>
-                </div>
-            </div>
-
-            <div class="scenario-body">
-                <!-- Question utilisateur -->
-                <div class="chat-bubble user-bubble">
-                    <div class="bubble-header">👤 Question posée par l'utilisateur</div>
-                    <div class="bubble-content">« Bonjour, je cherche un atelier pour m&#x27;initier au numérique et aux bases de l&#x27;informatique. »</div>
-                </div>
-
-                <!-- Comparaison côte à côte Référence Humaine vs Réponse IA -->
-                <div class="comparison-grid">
-                    <div class="ref-bubble">
-                        <div class="bubble-header">📋 Réponse annotée par l'humain (Vérité terrain / Ground Truth)</div>
-                        <div class="bubble-content"><p style="margin-bottom: 0.6rem;">Pour vous initier au numérique et découvrir les bases de l&#x27;informatique en 2026, la région Hauts-de-France propose plusieurs ateliers adaptés aux débutants. Vous pouvez par exemple participer aux ateliers d&#x27;initiation numérique organisés à la Médiathèque Nelson Mandela de Grande-Synthe (notamment en septembre et octobre 2026), ou aux sessions d&#x27;accompagnement informatique à Lille. Ces ateliers sont généralement gratuits sur inscription et permettent d&#x27;apprendre à utiliser un ordinateur, naviguer sur Internet et manipuler les outils du quotidien en toute confiance.</p></div>
+            <div class="scenario-card" id="scenario-1_thematic_digital">
+                <div class="scenario-header">
+                    <div>
+                        <span class="scenario-badge">Scénario 1_thematic_digital</span>
+                        <h3 class="scenario-title">Recherche thématique ciblée (Atelier numérique débutant)</h3>
+                        <p class="scenario-desc">🎯 <strong>Objectif :</strong> Vérifie l'extraction précise et exclusive de l'atelier d'initiation au numérique à Vervins (Aisne).</p>
                     </div>
-                    <div class="bot-bubble">
-                        <div class="bubble-header">🤖 Réponse générée par le Chatbot (Mistral AI + FAISS)</div>
-                        <div class="bubble-content"><p style="margin-bottom: 0.6rem;">Bonjour ! Je comprends tout à fait votre recherche pour vous initier au numérique et à l’informatique. Malheureusement, <strong>aucun événement pertinent pour 2026 dans les Hauts-de-France n’est encore disponible dans mon agenda</strong> pour répondre à votre besoin *à partir du 16 septembre 2026* (date actuelle de référence).</p>
-<p style="margin-bottom: 0.6rem;">Cependant, voici quelques suggestions basées sur les ateliers <strong>passés en 2026</strong> qui pourraient vous inspirer pour des formations similaires (et peut-être les retrouver en 2027 ou auprès d’autres structures) :</p>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;">### <strong>Ateliers numériques déjà proposés en 2026</strong> *(pour vous donner une idée des formats)*</p>
-<p style="margin-bottom: 0.6rem;">1. <strong>Les RDV numériques du vendredi – Vers l’autonomie</strong></p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;"><strong>Lieu</strong> : Tac Tic Animation, Vervins</li>
-<li style="margin-bottom: 0.35rem;"><strong>Période</strong> : Du 22 mai au 24 juillet 2026 (les vendredis)</li>
-<li style="margin-bottom: 0.35rem;"><strong>Contenu</strong> : Ateliers pratiques pour apprendre à utiliser le numérique au quotidien (ex : gestion de mails, navigation internet, autonomie sur les outils basiques).</li>
-<li style="margin-bottom: 0.35rem;"><strong>Tarif</strong> : 5€ + 2,50€ d’adhésion annuelle.</li>
-<li style="margin-bottom: 0.35rem;">*Pourquoi ça vous aurait plu ?* : Ces ateliers étaient conçus pour les débutants, avec un rythme régulier et un accompagnement progressif. Une excellente base pour gagner en confiance !</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">2. <strong>ATELIERS NUMERIQUES 1/6</strong> *(et 3/6)*</p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;"><strong>Lieu</strong> : Maison de quartier Saint-Jacques, Grande-Synthe</li>
-<li style="margin-bottom: 0.35rem;"><strong>Dates</strong> :</li>
-<li style="margin-bottom: 0.35rem;"><strong>1/6</strong> : Mercredi 16 septembre 2026 (déjà passé).</li>
-<li style="margin-bottom: 0.35rem;"><strong>3/6</strong> : Mercredi 23 septembre 2026 (prochain atelier, mais trop tard pour 2026).</li>
-<li style="margin-bottom: 0.35rem;"><strong>Contenu</strong> : Initiation à la création d’adresses mail, navigation sur internet, et utilisation basique d’un ordinateur.</li>
-<li style="margin-bottom: 0.35rem;">*Pourquoi ça vous aurait intéressé ?* : Ces ateliers sont <strong>accessibles à tous</strong>, sans prérequis, et proposent un apprentissage <strong>pas à pas</strong> dans un cadre convivial.</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;">### <strong>Que faire maintenant ?</strong></p>
-<p style="margin-bottom: 0.6rem;">1. <strong>Cherchez des formations similaires en 2027</strong> :</p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;">Les structures comme Tac Tic Animation ou les Maisons de quartier organisent souvent des cycles annuels. Consultez leurs sites ou leurs pages OpenAgenda pour les prochaines éditions.</li>
-<li style="margin-bottom: 0.35rem;">*Exemple* : [OpenAgenda – Recherche &quot;ateliers numériques 2027&quot;](https://openagenda.com/region-hauts-de-france) (à adapter selon les années).</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">2. <strong>Contactez des espaces publics numériques (EPN)</strong> :</p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;">Les <strong>Médiathèques</strong>, <strong>Bibliothèques</strong> ou <strong>Centres sociaux</strong> de votre ville proposent souvent des ateliers gratuits ou peu coûteux. Exemples :</li>
-<li style="margin-bottom: 0.35rem;"><strong>Médiathèque de Lille</strong> (ateliers &quot;Premiers clics&quot;).</li>
-<li style="margin-bottom: 0.35rem;"><strong>EPN de Valenciennes</strong> (initiation informatique).</li>
-<li style="margin-bottom: 0.35rem;">*Où les trouver ?* : Via votre mairie ou le site [Hauts-de-France Numérique](https://www.hauts-de-france.numerique.fr).</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">3. <strong>Plateformes en ligne</strong> :</p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;">Si vous préférez apprendre à votre rythme, des ressources gratuites existent :</li>
-<li style="margin-bottom: 0.35rem;"><strong>Gouvernement.fr</strong> : [MonCompteFormation](https://www.moncompteformation.gouv.fr/) (certifications numériques).</li>
-<li style="margin-bottom: 0.35rem;"><strong>Canopé</strong> : [Ateliers numériques pour débutants](https://www.reseau-canope.fr/).</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;">### <strong>Prochaine étape ?</strong></p>
-<p style="margin-bottom: 0.6rem;">Souhaitez-vous que je vous aide à :</p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;"><strong>Trouver des alternatives en 2027</strong> (en surveillant les annonces) ?</li>
-<li style="margin-bottom: 0.35rem;"><strong>Vous orienter vers des ressources en ligne</strong> pour commencer dès maintenant ?</li>
-<li style="margin-bottom: 0.35rem;"><strong>Vous suggérer des lieux proches de chez vous</strong> (si vous précisez votre ville) ?</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">Je reste à votre disposition pour affiner votre recherche ! 😊</p></div>
+                    <div class="scenario-header-actions">
+                        <span class="badge badge-success" style="font-size: 0.9rem; padding: 0.4rem 0.85rem;">
+                            Correcte
+                        </span>
+                        <span class="badge badge-latency">⏱️ 7.26 s</span>
                     </div>
                 </div>
 
-                <!-- Bloc d'évaluation de conformité -->
-                <div class="eval-card">
-                    <div class="eval-header">
-                        <h4 style="font-size: 1rem; color: #1e293b; font-weight: 700;">
-                            🎯 Évaluation de la réponse IA par rapport à la référence humaine
-                        </h4>
-                        <div class="eval-metrics-pills">
-                            <span class="metric-pill">Exact Match factuel : <strong>100%</strong></span>
-                            <span class="metric-pill">Similarité lexicale F1 : <strong>18.8%</strong></span>
+                <div class="scenario-body">
+                    <div class="chat-bubble user-bubble">
+                        <div class="bubble-header">👤 Question posée par l'utilisateur (très précise)</div>
+                        <div class="bubble-content">« Bonjour, je suis débutant en informatique et j'habite dans l'Aisne. Quels sont les horaires, le lieu exact, le programme et le tarif de l'atelier d'initiation au numérique organisé à Vervins en 2026 ? »</div>
+                    </div>
+
+                    <div class="comparison-grid">
+                        <div class="ref-bubble">
+                            <div class="bubble-header">📋 Réponse annotée par l'humain (Vérité terrain / Ground Truth)</div>
+                            <div class="bubble-content"><p style="margin-bottom: 0.6rem;">À Vervins (02140), dans l&#x27;Aisne, le Centre Socioculturel Tac Tic Animation organise le cycle d&#x27;ateliers « Les RDV numériques du vendredi – Vers l’autonomie » :</p>
+<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
+<li style="margin-bottom: 0.35rem;"><strong>Lieu exact</strong> : Tac Tic Animation, 9 avenue Paul Doumer, 02140 Vervins (Aisne).</li>
+<li style="margin-bottom: 0.35rem;"><strong>Dates et horaires</strong> : Les vendredis du 22 mai au 24 juillet 2026, de 14h00 à 15h30.</li>
+<li style="margin-bottom: 0.35rem;"><strong>Programme</strong> : Ateliers pratiques hebdomadaires en petit groupe pour gagner en autonomie dans les usages du quotidien : gestion des fichiers et des photos, prise en main du smartphone, personnalisation de son ordinateur, découverte d&#x27;outils comme Canva ou Excel, et initiation à Linux.</li>
+<li style="margin-bottom: 0.35rem;"><strong>Tarif et adhésion</strong> : 5 € par séance (+ 2,50 € d&#x27;adhésion annuelle à l&#x27;association).</li>
+<li style="margin-bottom: 0.35rem;"><strong>Modalités d&#x27;inscription</strong> : Renseignements et inscription par téléphone au 03 23 97 79 72 ou directement auprès de Tac Tic Animation.</li>
+</ul></div>
+                        </div>
+                        <div class="bot-bubble">
+                            <div class="bubble-header">🤖 Réponse générée par le Chatbot (Mistral AI + FAISS)</div>
+                            <div class="bubble-content"><p style="margin-bottom: 0.6rem;">Bonjour !</p>
+<p style="margin-bottom: 0.6rem;">Vous faites référence aux <strong>RDV numériques du vendredi – Vers l’autonomie</strong>, qui se sont tenus à <strong>Vervins</strong> en 2026. Voici les détails précis concernant cet atelier, qui s’est déroulé du <strong>22 mai au 24 juillet 2026</strong> :</p>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;"><strong>📍 Lieu exact</strong> :</p>
+<p style="margin-bottom: 0.6rem;">Centre Socioculturel <strong>Tac Tic Animation</strong></p>
+<p style="margin-bottom: 0.6rem;">9 avenue Paul Doumer</p>
+<p style="margin-bottom: 0.6rem;"><strong>02140 Vervins</strong> (Aisne)</p>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;"><strong>📅 Dates et horaires</strong> :</p>
+<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
+<li style="margin-bottom: 0.35rem;"><strong>Période</strong> : Du <strong>vendredi 22 mai 2026 au vendredi 24 juillet 2026</strong> (inclus).</li>
+<li style="margin-bottom: 0.35rem;"><strong>Horaire</strong> : Les <strong>vendredis</strong> (horaire non précisé dans le contexte, mais généralement entre 14h et 18h pour ce type d’ateliers – nous vous conseillons de vérifier auprès de l’organisateur pour une confirmation exacte).</li>
+</ul>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;"><strong>💻 Programme</strong> :</p>
+<p style="margin-bottom: 0.6rem;">Ces ateliers hebdomadaires proposaient une <strong>initiation progressive et conviviale</strong> aux outils numériques du quotidien, adaptés à tous les niveaux. Au programme :</p>
+<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
+<li style="margin-bottom: 0.35rem;"><strong>Gestion des fichiers et photos</strong> : Organisation et manipulation de vos documents.</li>
+<li style="margin-bottom: 0.35rem;"><strong>Prise en main du smartphone</strong> : Découverte des fonctionnalités essentielles.</li>
+<li style="margin-bottom: 0.35rem;"><strong>Personnalisation de son ordinateur</strong> : Adaptation de l’interface à vos besoins.</li>
+<li style="margin-bottom: 0.35rem;"><strong>Découverte d’outils comme Canva</strong> (création graphique) ou <strong>Excel</strong> (tableurs).</li>
+<li style="margin-bottom: 0.35rem;"><strong>Initiation à Linux</strong> : Pour explorer d’autres systèmes d’exploitation.</li>
+</ul>
+<p style="margin-bottom: 0.6rem;">Chaque séance alternait entre <strong>apports théoriques</strong>, <strong>exercices pratiques</strong> et <strong>accompagnement individualisé</strong> pour progresser à votre rythme.</p>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;"><strong>💰 Tarif</strong> :</p>
+<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
+<li style="margin-bottom: 0.35rem;"><strong>5 € par séance</strong> (prix de l’atelier).</li>
+<li style="margin-bottom: 0.35rem;"><strong>2,50 € d’adhésion annuelle</strong> au centre socioculturel (obligatoire pour participer).</li>
+</ul>
+<p style="margin-bottom: 0.6rem;">*Total estimé par séance : 7,50 €*.</p>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;"><strong>📞 Contact et inscription</strong> :</p>
+<p style="margin-bottom: 0.6rem;">*Cet atelier a déjà eu lieu en 2026, mais vous pouvez consulter le lien officiel pour plus de détails ou contacter le centre pour des informations sur d’éventuelles nouvelles sessions en 2027* :</p>
+<p style="margin-bottom: 0.6rem;">🔗 [Lien officiel](https://openagenda.com/printemps-numerique-2026/events/informatique-debutant)</p>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;"><strong>📢 Conseils</strong> :</p>
+<p style="margin-bottom: 0.6rem;">Si vous souhaitez reprendre une formation similaire, je vous invite à contacter directement le <strong>Centre Tac Tic Animation</strong> pour connaître les prochaines dates ou ateliers en cours. Leur équipe sera ravie de vous guider !</p>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;">*Remarque* : Aucun atelier identique n’est actuellement programmé dans le contexte fourni pour 2026, mais des alternatives comme les <strong>ateliers numériques individuels à Hirson</strong> (passés en avril-mai 2026) ou les <strong>RDV du numérique à Carvin</strong> (en cours jusqu’au 8 décembre 2026) pourraient vous intéresser. Souhaitez-vous que je vous en parle ?</p></div>
                         </div>
                     </div>
-                    <p class="eval-justif"><em>La réponse contient toutes les informations attendues et respecte fidèlement la référence annotée par l&#x27;humain.</em></p>
-                    <ul class="criteria-list">
-                        <li class='criteria-item valid'><span>✅</span> <strong>Thématique numérique / informatique</strong> : <span class='matched-term'>« numérique »</span></li>
-<li class='criteria-item valid'><span>✅</span> <strong>Format atelier / initiation</strong> : <span class='matched-term'>« atelier »</span></li>
-<li class='criteria-item valid'><span>✅</span> <strong>Mention de l&#x27;année 2026</strong> : <span class='matched-term'>« 2026 »</span></li>
-<li class='criteria-item valid'><span>✅</span> <strong>Localisation Hauts-de-France (ville ou lieu)</strong> : <span class='matched-term'>« grande-synthe »</span></li>
-<li class='criteria-item valid'><span>✅</span> <strong>Conditions d&#x27;accès ou gratuité</strong> : <span class='matched-term'>« gratuit »</span></li>
-                    </ul>
-                </div>
 
-                <!-- Sources documentaires -->
-                <details class="sources-accordion">
-                    <summary class="sources-summary">
-                        🔍 Sources documentaires FAISS exploitées (4)
-                    </summary>
-                    <div style="padding-top: 0.75rem;">
-                        
-            <table class="sources-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Événement & extrait</th>
-                        <th>Ville</th>
-                        <th>Distance L2</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    
-                <tr>
-                    <td style="width: 40px; text-align: center;"><strong>1</strong></td>
-                    <td><strong>Les RDV numériques du vendredi – Vers l’autonomie</strong><br><small style="color: #64748b;">Des ateliers pratiques pour apprendre à utiliser le numérique au quotidien en toute autonomie....</small></td>
-                    <td><span class="badge badge-ville">Vervins</span></td>
-                    <td style="font-family: monospace;">0.2028</td>
-                    <td><a href="https://openagenda.com/printemps-numerique-2026/events/informatique-debutant" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a></td>
-                </tr>
-                
-                <tr>
-                    <td style="width: 40px; text-align: center;"><strong>2</strong></td>
-                    <td><strong>Café Numérique : info ou intox ? Spécial poisson d&#x27;avril !</strong><br><small style="color: #64748b;">Un atelier pour apprendre à utiliser des outils numériques simples pour démêler l&#x27;info....</small></td>
-                    <td><span class="badge badge-ville">Saint-Quentin</span></td>
-                    <td style="font-family: monospace;">0.2313</td>
-                    <td><a href="https://openagenda.com/printemps-numerique-2026/events/cafe-numerique-info-ou-intox-special-poisson-davril" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a></td>
-                </tr>
-                
-                <tr>
-                    <td style="width: 40px; text-align: center;"><strong>3</strong></td>
-                    <td><strong>ATELIERS NUMERIQUES 1/6</strong><br><small style="color: #64748b;">Rejoignez nos ateliers numériques, spécialement conçus pour ceux qui souhaitent se familiariser avec l&#x27;ordinateur et internet. Découvrir pas à pas comment créer une adresse mail, n...</small></td>
-                    <td><span class="badge badge-ville">Grande-Synthe</span></td>
-                    <td style="font-family: monospace;">0.2320</td>
-                    <td><a href="https://openagenda.com/region-hauts-de-france/events/ateliers-numeriques-16-4884565" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a></td>
-                </tr>
-                
-                <tr>
-                    <td style="width: 40px; text-align: center;"><strong>4</strong></td>
-                    <td><strong>ATELIERS NUMERIQUES 3/6</strong><br><small style="color: #64748b;">Rejoignez nos ateliers numériques, spécialement conçus pour ceux qui souhaitent se familiariser avec l&#x27;ordinateur et internet. Découvrir pas à pas comment créer une adresse mail, n...</small></td>
-                    <td><span class="badge badge-ville">Grande-Synthe</span></td>
-                    <td style="font-family: monospace;">0.2320</td>
-                    <td><a href="https://openagenda.com/region-hauts-de-france/events/ateliers-numeriques-36-3892445" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a></td>
-                </tr>
-                
-                </tbody>
-            </table>
+                    <div class="eval-card">
+                        <div class="eval-header">
+                            <h4 style="font-size: 1.05rem; color: #1e293b; font-weight: 700;">
+                                🎯 Évaluation 100 % Autonome par le Framework Ragas
+                            </h4>
+                            <div class="eval-metrics-pills">
+                                
+                                <span class='metric-pill ragas-pill'>Ragas Answer Correctness : <strong>79.3%</strong></span>
+                                
+                                
+                                <span class='metric-pill ragas-pill'>Ragas Faithfulness : <strong>77.8%</strong></span>
+                                
+                                
+                                <span class='metric-pill ragas-pill'>Ragas Answer Relevancy : <strong>81.6%</strong></span>
+                                
+                            </div>
+                        </div>
+                        <p class="eval-justif"><em>Réponse factuellement juste et conforme aux sources (Ragas Correctness : 79.3%).</em></p>
+                    </div>
+
+                    <details class="eval-accordion">
+                        <summary class="eval-summary">
+                            💡 Comprendre les scores Ragas de ce scénario (Détail des 3 métriques)
+                        </summary>
+                        <div class="eval-accordion-content">
+                            <div class="metric-explain-box">
+                                <strong>1. Faithfulness (Fidélité au contexte) : 77.8%</strong>
+                                <p>Fidélité modérée (77.8%) : la majorité des faits reposent sur les documents, mais certaines propositions ou déductions ne sont pas explicitement vérifiables dans les extraits récupérés.</p>
+                            </div>
+                            <div class="metric-explain-box">
+                                <strong>2. Answer Correctness (Justesse factuelle vs Référence) : 79.3%</strong>
+                                <p>Très bonne justesse (79.3%) : forte correspondance entre les faits générés et la réponse de référence humaine (vrais positifs TP élevés, très peu d'omissions FN) combinée à une similarité sémantique élevée (75% faits + 25% embeddings).</p>
+                            </div>
+                            <div class="metric-explain-box">
+                                <strong>3. Answer Relevancy (Pertinence vis-à-vis de la question) : 81.6%</strong>
+                                <p>Forte pertinence (81.6%) : le juge Ragas a rétro-généré des questions à partir de la réponse et constaté qu'elles ciblent précisément la demande initiale de l'utilisateur.</p>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details class="sources-accordion">
+                        <summary class="sources-summary">
+                            🔍 Sources documentaires FAISS exploitées (4)
+                        </summary>
+                        <div style="padding-top: 0.75rem;">
+                            
+                            <table class="sources-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Événement & extrait indexé</th>
+                                        <th>Ville</th>
+                                        <th>Distance FAISS (L2)</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;"><strong>1</strong></td>
+                                        <td><strong>Les RDV numériques du vendredi – Vers l’autonomie</strong><br><small style="color: #64748b;">Des ateliers pratiques pour apprendre à utiliser le numérique au quotidien en toute autonomie....</small></td>
+                                        <td><span class="badge badge-ville">Vervins</span></td>
+                                        <td style="font-family: monospace;">0.2943</td>
+                                        <td>
+                                            
+                                            <a href="https://openagenda.com/printemps-numerique-2026/events/informatique-debutant" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a>
+                                            
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;"><strong>2</strong></td>
+                                        <td><strong>Atelier Numérique Individuel</strong><br><small style="color: #64748b;">Les ateliers numériques individuels sont des séances d’accompagnement personnalisées qui aident à apprendre et utiliser les outils numériques du quotidien (ordinateur, Internet, dé...</small></td>
+                                        <td><span class="badge badge-ville">Hirson</span></td>
+                                        <td style="font-family: monospace;">0.2968</td>
+                                        <td>
+                                            
+                                            <a href="https://openagenda.com/printemps-numerique-2026/events/atelier-numerique-individuel-5243003" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a>
+                                            
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;"><strong>3</strong></td>
+                                        <td><strong>Cap sur le numérique ! : Ateliers numérique débutant</strong><br><small style="color: #64748b;">Avec cet atelier, domptez ordi, Internet et démarches en ligne… et boostez votre super‑pouvoir numérique en toute tranquillité !...</small></td>
+                                        <td><span class="badge badge-ville">Carvin</span></td>
+                                        <td style="font-family: monospace;">0.3172</td>
+                                        <td>
+                                            
+                                            <a href="https://openagenda.com/culture-et-evenements-ville-carvin/events/cap-sur-le-numerique-ateliers-numerique-debutant" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a>
+                                            
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;"><strong>4</strong></td>
+                                        <td><strong>Boostez votre retour à l'emploi grâce au numérique</strong><br><small style="color: #64748b;">Dans le cadre du printemps Numérique, venez participez à un atelier dédié à la découverte et à la prise en main des outils numériques "Accélérer le retour à l'emploi grâce au numér...</small></td>
+                                        <td><span class="badge badge-ville">Oulchy-le-Château</span></td>
+                                        <td style="font-family: monospace;">0.3027</td>
+                                        <td>
+                                            
+                                            <a href="https://openagenda.com/francetravail/events/boostez-votre-retour-a-lemploi-grace-au-numerique" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a>
+                                            
+                                        </td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                            
+                        </div>
+                    </details>
+                </div>
+            </div>
             
+            <div class="scenario-card" id="scenario-2_family_nature">
+                <div class="scenario-header">
+                    <div>
+                        <span class="scenario-badge">Scénario 2_family_nature</span>
+                        <h3 class="scenario-title">Recommandation familiale (Éveil nature tout-petits)</h3>
+                        <p class="scenario-desc">🎯 <strong>Objectif :</strong> Vérifie le ciblage pour les tout-petits (1-3 ans) à Don, la gratuité et les contacts d'inscription.</p>
                     </div>
-                </details>
-            </div>
-        </div>
-        
-
-        <div class="scenario-card" id="scenario-2_family_nature">
-            <div class="scenario-header">
-                <div>
-                    <span class="scenario-badge">Scénario 2_family_nature</span>
-                    <h3 class="scenario-title">Recommandation familiale (Sortie nature avec enfants)</h3>
-                    <p class="scenario-desc">🎯 <strong>Objectif :</strong> Vérifie le ciblage par public (enfants/familles) et thématique nature.</p>
-                </div>
-                <div class="scenario-header-actions">
-                    <span class="badge badge-success" style="font-size: 0.9rem; padding: 0.4rem 0.85rem;">
-                        Correcte
-                    </span>
-                    <span class="badge badge-latency">⏱️ 21.25 s</span>
-                </div>
-            </div>
-
-            <div class="scenario-body">
-                <!-- Question utilisateur -->
-                <div class="chat-bubble user-bubble">
-                    <div class="bubble-header">👤 Question posée par l'utilisateur</div>
-                    <div class="bubble-content">« Quelles activités ludiques ou sorties nature sont adaptées aux familles avec des enfants ? »</div>
-                </div>
-
-                <!-- Comparaison côte à côte Référence Humaine vs Réponse IA -->
-                <div class="comparison-grid">
-                    <div class="ref-bubble">
-                        <div class="bubble-header">📋 Réponse annotée par l'humain (Vérité terrain / Ground Truth)</div>
-                        <div class="bubble-content"><p style="margin-bottom: 0.6rem;">Pour une sortie nature en famille avec des enfants en 2026, plusieurs rendez-vous ludiques et pédagogiques sont programmés dans les Hauts-de-France. Vous pouvez participer à des animations de découverte de la faune et de la biodiversité (comme l&#x27;observation des chauves-souris ou des oiseaux dans les espaces naturels régionaux, ou des ateliers nature au parc zoologique). Ces sorties sont spécialement conçues pour le jeune public et les parents, offrant une approche ludique de l&#x27;environnement avec des guides-animateurs passionnés.</p></div>
-                    </div>
-                    <div class="bot-bubble">
-                        <div class="bubble-header">🤖 Réponse générée par le Chatbot (Mistral AI + FAISS)</div>
-                        <div class="bubble-content"><p style="margin-bottom: 0.6rem;">Voici une sélection d’activités <strong>ludiques et nature</strong> qui se sont déroulées en 2026 dans les Hauts-de-France et qui auraient pu ravir les familles avec des enfants. Bien que certains événements soient déjà passés, je vous propose des alternatives proches dans le temps ou des idées inspirées par ces initiatives pour vos prochaines sorties !</p>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;">### <strong>1. Balade à vélo au départ de Compiègne (avril 2026) – Une escapade familiale et sportive</strong></p>
-<p style="margin-bottom: 0.6rem;"><strong>Titre</strong> : Balade à vélo au départ de Compiègne</p>
-<p style="margin-bottom: 0.6rem;"><strong>Lieu</strong> : Place de l’hôtel de ville, Compiègne (60200)</p>
-<p style="margin-bottom: 0.6rem;"><strong>Date</strong> : Samedi 25 avril 2026, à 14h00</p>
-<p style="margin-bottom: 0.6rem;"><strong>Statut</strong> : Événement passé (mais idéal pour s’inspirer !)</p>
-<p style="margin-bottom: 0.6rem;"><strong>Pourquoi c’était parfait pour les familles ?</strong></p>
-<p style="margin-bottom: 0.6rem;">Cette balade <strong>familiale et accessible</strong> proposait des parcours adaptés aux enfants, avec des arrêts ludiques pour découvrir les alentours de Compiègne. Un excellent moyen de partager un moment actif en plein air, sans effort trop intense. Les participants pouvaient emprunter des vélos en libre-service ou apporter les leurs.</p>
-<p style="margin-bottom: 0.6rem;"><strong>À reproduire</strong> :</p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;"><strong>Quand ?</strong> : Les week-ends ensoleillés (printemps/été 2027).</li>
-<li style="margin-bottom: 0.35rem;"><strong>Où ?</strong> : Départ depuis la place de l’hôtel de ville ou le parc de Chantilly (à 20 min en voiture).</li>
-<li style="margin-bottom: 0.35rem;"><strong>Conseil</strong> : Vérifiez les locations de vélos enfants (ex : <strong>Vélôise</strong> ou <strong>Véloparc</strong>) et privilégiez les parcours plats comme celui de la <strong>Basse-Oise</strong>.</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;">### <strong>2. Mercredi des tout-petits (septembre 2026) – Un atelier nature pour les 1-3 ans</strong></p>
-<p style="margin-bottom: 0.6rem;"><strong>Titre</strong> : Mercredi des tout-petits *(complet, mais à reproduire !)*</p>
-<p style="margin-bottom: 0.6rem;"><strong>Lieu</strong> : DON (Découverte Nature et Oiseaux), Don (62)</p>
-<p style="margin-bottom: 0.6rem;"><strong>Adresse</strong> : 3-13 rue Abbé Dubus</p>
-<p style="margin-bottom: 0.6rem;"><strong>Date</strong> : Mercredi 9 septembre 2026, à 10h30</p>
-<p style="margin-bottom: 0.6rem;"><strong>Statut</strong> : Événement passé (gratuit sur inscription)</p>
-<p style="margin-bottom: 0.6rem;"><strong>Pourquoi c’était idéal ?</strong></p>
-<p style="margin-bottom: 0.6rem;">Cet atelier <strong>100 % nature</strong> était conçu pour les tout-petits (1 à 3 ans) avec des activités simples :</p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;">Rencontres avec des animaux locaux (oiseaux, insectes).</li>
-<li style="margin-bottom: 0.35rem;">Jeux sensoriels (feuilles, cailloux, sons de la forêt).</li>
-<li style="margin-bottom: 0.35rem;">Accompagnement par des animateurs patients et bienveillants.</li>
-</ul>
-<p style="margin-bottom: 0.6rem;"><strong>À reproduire</strong> :</p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;"><strong>Quand ?</strong> : Les mercredis matins (ex : <strong>1er mercredi de chaque mois</strong> en 2027).</li>
-<li style="margin-bottom: 0.35rem;"><strong>Où ?</strong> : Autres centres comme :</li>
-<li style="margin-bottom: 0.35rem;"><strong>Le Jardin des Plantes de Lille</strong> (ateliers &quot;Petits Explorateurs&quot;).</li>
-<li style="margin-bottom: 0.35rem;"><strong>La Réserve naturelle de la Vallée de l’Aa</strong> (Watten, ateliers &quot;Découverte des écosystèmes&quot;).</li>
-<li style="margin-bottom: 0.35rem;"><strong>Budget</strong> : Gratuit ou peu coûteux (5-10€/enfant).</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;">### <strong>3. La p’tite famille au musée (août 2026) – Culture et jeu pour les 4 ans et +</strong></p>
-<p style="margin-bottom: 0.6rem;"><strong>Titre</strong> : La p’tite famille au musée</p>
-<p style="margin-bottom: 0.6rem;"><strong>Lieu</strong> : Musée Benoît-De-Puydt, Bailleul (59270)</p>
-<p style="margin-bottom: 0.6rem;"><strong>Adresse</strong> : 24 rue du Musée</p>
-<p style="margin-bottom: 0.6rem;"><strong>Date</strong> : Mercredi 26 août 2026, à 11h00</p>
-<p style="margin-bottom: 0.6rem;"><strong>Statut</strong> : Événement passé (sur inscription)</p>
-<p style="margin-bottom: 0.6rem;"><strong>Pourquoi c’était génial ?</strong></p>
-<p style="margin-bottom: 0.6rem;">Une visite <strong>ludique et interactive</strong> spécialement pensée pour les enfants dès 4 ans :</p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;">Parcours avec énigmes et jeux autour des collections.</li>
-<li style="margin-bottom: 0.35rem;">Ateliers manuels (dessin, création) inspirés par les œuvres.</li>
-<li style="margin-bottom: 0.35rem;">Ambiance conviviale pour les parents et enfants.</li>
-</ul>
-<p style="margin-bottom: 0.6rem;"><strong>À reproduire</strong> :</p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;"><strong>Quand ?</strong> : Les week-ends ou vacances scolaires (ex : <strong>juillet/août 2027</strong>).</li>
-<li style="margin-bottom: 0.35rem;"><strong>Où ?</strong> : Autres musées familiaux :</li>
-<li style="margin-bottom: 0.35rem;"><strong>Musée de l’Hospice Comtesse</strong> (Lille, ateliers &quot;Petits Curieux&quot;).</li>
-<li style="margin-bottom: 0.35rem;"><strong>Musée de la Chartreuse</strong> (Douai, visites &quot;Contes et Légendes&quot;).</li>
-<li style="margin-bottom: 0.35rem;"><strong>Conseil</strong> : Contactez les musées pour des <strong>visites adaptées</strong> (ex : &quot;Parcours des 5-10 ans&quot;).</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;">### <strong>4. Fête du moulin (juin 2026) – Une journée de partage et de découvertes</strong></p>
-<p style="margin-bottom: 0.6rem;"><strong>Titre</strong> : Fête du moulin</p>
-<p style="margin-bottom: 0.6rem;"><strong>Lieu</strong> : Médiathèque Henry Duflot, Fontaine-lès-Vervins (02140)</p>
-<p style="margin-bottom: 0.6rem;"><strong>Adresse</strong> : 18 rue du Vieux Château</p>
-<p style="margin-bottom: 0.6rem;"><strong>Date</strong> : Dimanche 28 juin 2026, à 10h00</p>
-<p style="margin-bottom: 0.6rem;"><strong>Statut</strong> : Événement passé (gratuit)</p>
-<p style="margin-bottom: 0.6rem;"><strong>Pourquoi c’était une belle idée ?</strong></p>
-<p style="margin-bottom: 0.6rem;">Un événement <strong>100 % familial</strong> mêlant :</p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;">Découverte des moulins à eau/vent (histoire locale).</li>
-<li style="margin-bottom: 0.35rem;">Ateliers artisanaux (fabriquer des meules, jeux traditionnels).</li>
-<li style="margin-bottom: 0.35rem;">Animation musicale et contes.</li>
-</ul>
-<p style="margin-bottom: 0.6rem;"><strong>À reproduire</strong> :</p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;"><strong>Quand ?</strong> : Les dimanches de juin/septembre 2027.</li>
-<li style="margin-bottom: 0.35rem;"><strong>Où ?</strong> : Autres sites :</li>
-<li style="margin-bottom: 0.35rem;"><strong>Moulin de la Malmaison</strong> (Cambrai, visites et ateliers).</li>
-<li style="margin-bottom: 0.35rem;"><strong>Fête de la Nature</strong> (printemps 2027, partout en région).</li>
-<li style="margin-bottom: 0.35rem;"><strong>Bonus</strong> : Associez à une <strong>pique-nique en bord de rivière</strong> (ex : <strong>Aisne</strong> ou <strong>Somme</strong>).</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;">### <strong>5. Idées pour 2027 (à venir) – À surveiller !</strong></p>
-<p style="margin-bottom: 0.6rem;">Bien que les événements cités soient passés, voici <strong>3 pistes pour 2027</strong> (à confirmer sur les sites officiels) :</p>
-<p style="margin-bottom: 0.6rem;">1. <strong>Les &quot;Dimanches en Famille&quot;</strong> au <strong>Parc naturel régional Scarpe-Escaut</strong> (ateliers nature et jeux).</p>
-<p style="margin-bottom: 0.6rem;">2. <strong>Les &quot;Journées du Patrimoine&quot;</strong> (septembre 2027) : Certains sites proposent des <strong>visites &quot;Enfants et Patrimoine&quot;</strong> (ex : <strong>Abbaye de Vauclair</strong>).</p>
-<p style="margin-bottom: 0.6rem;">3. <strong>Les &quot;Festivals des Petits&quot;</strong> (ex : <strong>Festival des Petits Pas</strong> à Amiens, été 2027).</p>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;">### <strong>Où trouver ces activités en 2027 ?</strong></p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;"><strong>Agendas culturels</strong> :</li>
-<li style="margin-bottom: 0.35rem;">[OpenAgenda](https://openagenda.com/) (filtrez par &quot;famille&quot; ou &quot;nature&quot;).</li>
-<li style="margin-bottom: 0.35rem;">Sites des <strong>Parcs naturels régionaux</strong> (ex : [Scarpe-Escaut](https://www.parc-scarpe-escaut.fr/)).</li>
-<li style="margin-bottom: 0.35rem;"><strong>Offices de tourisme</strong> : Ils proposent souvent des <strong>pass famille</strong> (ex : <strong>Lille Métropole</strong>, <strong>Picardie Nature</strong>).</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;">### <strong>Résumé des alternatives pour 2027</strong></p>
-<p style="margin-bottom: 0.6rem;">| <strong>Type d&#x27;activité</strong>       | <strong>Exemples de lieux</strong>                          | <strong>Période idéale</strong>       |</p>
-<p style="margin-bottom: 0.6rem;">|---------------------------|-----------------------------------------------|--------------------------|</p>
-<p style="margin-bottom: 0.6rem;">| Balade à vélo             | Compiègne, Chantilly, Parc naturel Scarpe-Escaut | Printemps/été           |</p>
-<p style="margin-bottom: 0.6rem;">| Ateliers nature           | DON (Don), Réserve de la Vallée de l’Aa       | Mercredis matins        |</p>
-<p style="margin-bottom: 0.6rem;">| Visites ludiques          | Musée Benoît-De-Puydt, Chartreuse de Douai    | Vacances scolaires       |</p>
-<p style="margin-bottom: 0.6rem;">| Fêtes thématiques         | Moulins, Journées du Patrimoine                | Juin/septembre           |</p>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;">### <strong>Conseil perso</strong></p>
-<p style="margin-bottom: 0.6rem;">Pour une sortie <strong>parfaite</strong>, combinez :</p>
-<p style="margin-bottom: 0.6rem;">1. <strong>Une activité principale</strong> (ex : balade à vélo).</p>
-<p style="margin-bottom: 0.6rem;">2. <strong>Un temps calme</strong> (ex : pique-nique dans un parc comme <strong>Parc Zoologique de Lille</strong>).</p>
-<p style="margin-bottom: 0.6rem;">3. <strong>Un atelier créatif</strong> (ex : atelier &quot;Fabrique ton moulin&quot; au <strong>Musée de l’Agriculture</strong> à Saint-Quentin).</p>
-<p style="margin-bottom: 0.6rem;">N’hésitez pas à me dire si vous souhaitez des précisions sur un type d’activité en particulier (ex : &quot;plus axé animaux&quot;, &quot;plus de jeux en extérieur&quot;) ! 😊</p></div>
+                    <div class="scenario-header-actions">
+                        <span class="badge badge-success" style="font-size: 0.9rem; padding: 0.4rem 0.85rem;">
+                            Correcte
+                        </span>
+                        <span class="badge badge-latency">⏱️ 6.91 s</span>
                     </div>
                 </div>
 
-                <!-- Bloc d'évaluation de conformité -->
-                <div class="eval-card">
-                    <div class="eval-header">
-                        <h4 style="font-size: 1rem; color: #1e293b; font-weight: 700;">
-                            🎯 Évaluation de la réponse IA par rapport à la référence humaine
-                        </h4>
-                        <div class="eval-metrics-pills">
-                            <span class="metric-pill">Exact Match factuel : <strong>100%</strong></span>
-                            <span class="metric-pill">Similarité lexicale F1 : <strong>11.2%</strong></span>
+                <div class="scenario-body">
+                    <div class="chat-bubble user-bubble">
+                        <div class="bubble-header">👤 Question posée par l'utilisateur (très précise)</div>
+                        <div class="bubble-content">« Bonjour, je cherche une activité nature gratuite pour mon enfant de 2 ans dans le département du Nord en septembre 2026. Où et quand a lieu le 'Mercredi des tout-petits', et quelles sont les modalités d'inscription ? »</div>
+                    </div>
+
+                    <div class="comparison-grid">
+                        <div class="ref-bubble">
+                            <div class="bubble-header">📋 Réponse annotée par l'humain (Vérité terrain / Ground Truth)</div>
+                            <div class="bubble-content"><p style="margin-bottom: 0.6rem;">L&#x27;animation nature « Mercredi des tout-petits » répond exactement à votre demande pour votre enfant de 2 ans dans le département du Nord :</p>
+<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
+<li style="margin-bottom: 0.35rem;"><strong>Lieu exact</strong> : Espace Découverte Nature et Oiseaux (DON), site de la Louvière, parking 3-13 rue Abbé Dubus, 59272 Don (Nord).</li>
+<li style="margin-bottom: 0.35rem;"><strong>Date et horaire</strong> : Mercredi 9 septembre 2026 de 10h30 à 11h30 (durée d&#x27;environ 1 heure).</li>
+<li style="margin-bottom: 0.35rem;"><strong>Public cible</strong> : Tout-petits de 1 à 3 ans accompagnés de leurs parents.</li>
+<li style="margin-bottom: 0.35rem;"><strong>Programme</strong> : Parcours sensoriel et découverte de la nature adaptée aux saisons avec un animateur nature de la Métropole Européenne de Lille.</li>
+<li style="margin-bottom: 0.35rem;"><strong>Modalités d&#x27;accès</strong> : Atelier gratuit sur inscription obligatoire par email à animationnature@lillemetropole.fr ou par téléphone au 06 30 46 37 16 (jauge limitée).</li>
+</ul></div>
+                        </div>
+                        <div class="bot-bubble">
+                            <div class="bubble-header">🤖 Réponse générée par le Chatbot (Mistral AI + FAISS)</div>
+                            <div class="bubble-content"><p style="margin-bottom: 0.6rem;">Voici les informations détaillées concernant l&#x27;activité <strong>&quot;Mercredi des tout-petits&quot;</strong> qui s&#x27;est tenue à <strong>Don (Nord)</strong> en septembre 2026 :</p>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;"><strong>Titre</strong> : *Mercredi des tout-petits* (Événement <strong>PASSÉ</strong>)</p>
+<p style="margin-bottom: 0.6rem;"><strong>Lieu</strong> : Don, <strong>3 - 13 rue Abbé Dubus</strong> (site de la Louvière, parking rue Abbé Dubus)</p>
+<p style="margin-bottom: 0.6rem;"><strong>Département</strong> : Nord</p>
+<p style="margin-bottom: 0.6rem;"><strong>Date</strong> : <strong>Mercredi 9 septembre 2026</strong> à <strong>10h30</strong> (durée : <strong>1 heure</strong>).</p>
+<p style="margin-bottom: 0.6rem;"><strong>Public</strong> : Enfants <strong>de 1 à 3 ans</strong> accompagnés de leurs parents.</p>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;">### <strong>Modalités pratiques</strong> :</p>
+<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
+<li style="margin-bottom: 0.35rem;"><strong>Gratuit</strong> : L&#x27;atelier était entièrement gratuit.</li>
+<li style="margin-bottom: 0.35rem;"><strong>Sur inscription obligatoire</strong> :</li>
+<li style="margin-bottom: 0.35rem;"><strong>Contact</strong> : Envoyer un mail à <strong>animationnature@lillemetropole.fr</strong>.</li>
+<li style="margin-bottom: 0.35rem;"><strong>Téléphone</strong> : MEL au <strong>06 30 46 37 16</strong> (pour toute question ou confirmation).</li>
+<li style="margin-bottom: 0.35rem;">*Bon à savoir* : Nombre de places <strong>limité</strong>, donc inscription recommandée dès que possible.</li>
+</ul>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;">### <strong>Description de l&#x27;activité</strong> :</p>
+<p style="margin-bottom: 0.6rem;">Cet atelier proposait une <strong>immersion sensorielle</strong> pour découvrir la nature à travers des thèmes liés aux saisons. Les tout-petits ont pu explorer des activités ludiques et adaptées à leur âge, dans un cadre naturel et interactif.</p>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;"><strong>Lien officiel</strong> : [Mercredi des tout-petits - OpenAgenda](https://openagenda.com/musee-des-ecoles/events/mercredi-des-tout-petits-7668875)</p>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;">*Note* : Cet événement est <strong>terminé</strong> (il s&#x27;est déroulé le 9 septembre 2026), mais voici une alternative <strong>proche dans le temps</strong> pour septembre 2026 :</p>
+<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
+<li style="margin-bottom: 0.35rem;"><strong>&quot;Les P’tits Kili&quot;</strong> (Tourcoing, <strong>mercredi 23 septembre 2026 à 10h30</strong>) : Une heure du conte pour les <strong>0-3 ans</strong>, <strong>gratuit</strong> et avec réservation conseillée. [Lien](https://openagenda.com/region-hauts-de-france/events/les-ptits-kili-5159430).</li>
+</ul>
+<p style="margin-bottom: 0.6rem;">Si vous souhaitez des détails sur cette alternative, n&#x27;hésitez pas à demander !</p></div>
                         </div>
                     </div>
-                    <p class="eval-justif"><em>La réponse contient toutes les informations attendues et respecte fidèlement la référence annotée par l&#x27;humain.</em></p>
-                    <ul class="criteria-list">
-                        <li class='criteria-item valid'><span>✅</span> <strong>Thématique nature / biodiversité / faune</strong> : <span class='matched-term'>« nature »</span></li>
-<li class='criteria-item valid'><span>✅</span> <strong>Ciblage famille / enfants</strong> : <span class='matched-term'>« famille »</span></li>
-<li class='criteria-item valid'><span>✅</span> <strong>Mention de l&#x27;année 2026</strong> : <span class='matched-term'>« 2026 »</span></li>
-<li class='criteria-item valid'><span>✅</span> <strong>Localisation régionale (Hauts-de-France)</strong> : <span class='matched-term'>« hauts-de-france »</span></li>
-                    </ul>
-                </div>
 
-                <!-- Sources documentaires -->
-                <details class="sources-accordion">
-                    <summary class="sources-summary">
-                        🔍 Sources documentaires FAISS exploitées (4)
-                    </summary>
-                    <div style="padding-top: 0.75rem;">
-                        
-            <table class="sources-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Événement & extrait</th>
-                        <th>Ville</th>
-                        <th>Distance L2</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    
-                <tr>
-                    <td style="width: 40px; text-align: center;"><strong>1</strong></td>
-                    <td><strong>La p&#x27;tite famille au musée</strong><br><small style="color: #64748b;">Une visite ludique et interactive pour les familles (à partir de 4 ans)...</small></td>
-                    <td><span class="badge badge-ville">Bailleul</span></td>
-                    <td style="font-family: monospace;">0.2762</td>
-                    <td><a href="https://openagenda.com/coeur-de-flandre-agglo/events/la-ptite-famille-au-musee" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a></td>
-                </tr>
-                
-                <tr>
-                    <td style="width: 40px; text-align: center;"><strong>2</strong></td>
-                    <td><strong>Balade à vélo au départ de Compiègne</strong><br><small style="color: #64748b;">Cette balade est une sortie familiale, facilement accessible et utilisant au maximum des parcours s...</small></td>
-                    <td><span class="badge badge-ville">Compiègne</span></td>
-                    <td style="font-family: monospace;">0.2847</td>
-                    <td><a href="https://openagenda.com/velooise/events/balade-a-velo-au-depart-de-compiegne-9149134" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a></td>
-                </tr>
-                
-                <tr>
-                    <td style="width: 40px; text-align: center;"><strong>3</strong></td>
-                    <td><strong>Fête du moulin</strong><br><small style="color: #64748b;">Evènement ludique, familial, de partage et de découverte...</small></td>
-                    <td><span class="badge badge-ville">Fontaine-lès-Vervins</span></td>
-                    <td style="font-family: monospace;">0.2951</td>
-                    <td><a href="https://openagenda.com/jpp2026/events/fete-du-moulin-4968164" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a></td>
-                </tr>
-                
-                <tr>
-                    <td style="width: 40px; text-align: center;"><strong>4</strong></td>
-                    <td><strong>COMPLET - Mercredi des tout-petits</strong><br><small style="color: #64748b;">Vous souhaitez partager un moment de nature avec un enfant âgé de 1 à 3 ans. Accompagné d’un animateur nature, de petites séquences d’activités vous emmèneront à la rencontre d’une...</small></td>
-                    <td><span class="badge badge-ville">Don</span></td>
-                    <td style="font-family: monospace;">0.3149</td>
-                    <td><a href="https://openagenda.com/musee-des-ecoles/events/mercredi-des-tout-petits-7668875" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a></td>
-                </tr>
-                
-                </tbody>
-            </table>
+                    <div class="eval-card">
+                        <div class="eval-header">
+                            <h4 style="font-size: 1.05rem; color: #1e293b; font-weight: 700;">
+                                🎯 Évaluation 100 % Autonome par le Framework Ragas
+                            </h4>
+                            <div class="eval-metrics-pills">
+                                
+                                <span class='metric-pill ragas-pill'>Ragas Answer Correctness : <strong>79.4%</strong></span>
+                                
+                                
+                                <span class='metric-pill ragas-pill'>Ragas Faithfulness : <strong>75.0%</strong></span>
+                                
+                                
+                                <span class='metric-pill ragas-pill'>Ragas Answer Relevancy : <strong>83.5%</strong></span>
+                                
+                            </div>
+                        </div>
+                        <p class="eval-justif"><em>Réponse factuellement juste et conforme aux sources (Ragas Correctness : 79.4%).</em></p>
+                    </div>
+
+                    <details class="eval-accordion">
+                        <summary class="eval-summary">
+                            💡 Comprendre les scores Ragas de ce scénario (Détail des 3 métriques)
+                        </summary>
+                        <div class="eval-accordion-content">
+                            <div class="metric-explain-box">
+                                <strong>1. Faithfulness (Fidélité au contexte) : 75.0%</strong>
+                                <p>Fidélité modérée (75.0%) : la majorité des faits reposent sur les documents, mais certaines propositions ou déductions ne sont pas explicitement vérifiables dans les extraits récupérés.</p>
+                            </div>
+                            <div class="metric-explain-box">
+                                <strong>2. Answer Correctness (Justesse factuelle vs Référence) : 79.4%</strong>
+                                <p>Très bonne justesse (79.4%) : forte correspondance entre les faits générés et la réponse de référence humaine (vrais positifs TP élevés, très peu d'omissions FN) combinée à une similarité sémantique élevée (75% faits + 25% embeddings).</p>
+                            </div>
+                            <div class="metric-explain-box">
+                                <strong>3. Answer Relevancy (Pertinence vis-à-vis de la question) : 83.5%</strong>
+                                <p>Forte pertinence (83.5%) : le juge Ragas a rétro-généré des questions à partir de la réponse et constaté qu'elles ciblent précisément la demande initiale de l'utilisateur.</p>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details class="sources-accordion">
+                        <summary class="sources-summary">
+                            🔍 Sources documentaires FAISS exploitées (4)
+                        </summary>
+                        <div style="padding-top: 0.75rem;">
+                            
+                            <table class="sources-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Événement & extrait indexé</th>
+                                        <th>Ville</th>
+                                        <th>Distance FAISS (L2)</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;"><strong>1</strong></td>
+                                        <td><strong>COMPLET - Mercredi des tout-petits</strong><br><small style="color: #64748b;">Vous souhaitez partager un moment de nature avec un enfant âgé de 1 à 3 ans. Accompagné d’un animateur nature, de petites séquences d’activités vous emmèneront à la rencontre d’une...</small></td>
+                                        <td><span class="badge badge-ville">Don</span></td>
+                                        <td style="font-family: monospace;">0.2526</td>
+                                        <td>
+                                            
+                                            <a href="https://openagenda.com/musee-des-ecoles/events/mercredi-des-tout-petits-7668875" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a>
+                                            
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;"><strong>2</strong></td>
+                                        <td><strong>Atelier de Confiance en Soi : Reprenez le Contrôle de Votre Avenir Professionnel le 17 septembre et 28 septembre</strong><br><small style="color: #64748b;">Participez à nos 2 ateliers sur la confiance en soi le vendredi 17 et 28 septembre 2026 de 09H à 11H30, spécialement conçu pour les demandeurs d'emploi avec une reconnaissance trav...</small></td>
+                                        <td><span class="badge badge-ville">Saint-Amand-les-Eaux</span></td>
+                                        <td style="font-family: monospace;">0.3655</td>
+                                        <td>
+                                            
+                                            <a href="https://openagenda.com/francetravail/events/atelier-de-confiance-en-soi-reprenez-le-controle-de-votre-avenir-professionnel-le-17-septembre-et-28-septembre" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a>
+                                            
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;"><strong>3</strong></td>
+                                        <td><strong>Les P´tits Kili</strong><br><small style="color: #64748b;">Une heure du conte pour les tout-petits. Des mots, des images, des couleurs… La découverte des livres et de la littérature dès le plus jeune âge....</small></td>
+                                        <td><span class="badge badge-ville">Tourcoing</span></td>
+                                        <td style="font-family: monospace;">0.3633</td>
+                                        <td>
+                                            
+                                            <a href="https://openagenda.com/region-hauts-de-france/events/les-ptits-kili-5159430" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a>
+                                            
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;"><strong>4</strong></td>
+                                        <td><strong>Parcours Grandeur nature ! La promenade continue dans les collections.</strong><br><small style="color: #64748b;">Avec le parcours "grandeur nature !", prolongez votre découverte du Musée des enfants en vous promenant dans le musée pour découvrir d'autres représentations de la nature aussi bel...</small></td>
+                                        <td><span class="badge badge-ville">Lille</span></td>
+                                        <td style="font-family: monospace;">0.3680</td>
+                                        <td>
+                                            
+                                            <a href="https://openagenda.com/culture/events/parcours-grandeur-nature-la-promenade-continue-dans-les-collections" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a>
+                                            
+                                        </td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                            
+                        </div>
+                    </details>
+                </div>
+            </div>
             
+            <div class="scenario-card" id="scenario-3_music_festival">
+                <div class="scenario-header">
+                    <div>
+                        <span class="scenario-badge">Scénario 3_music_festival</span>
+                        <h3 class="scenario-title">Recherche musicale festive (Concert jazz plein air)</h3>
+                        <p class="scenario-desc">🎯 <strong>Objectif :</strong> Vérifie la localisation exacte à Mortefontaine (Oise), la gratuité en plein air, les dates et le format du festival.</p>
                     </div>
-                </details>
-            </div>
-        </div>
-        
-
-        <div class="scenario-card" id="scenario-3_music_festival">
-            <div class="scenario-header">
-                <div>
-                    <span class="scenario-badge">Scénario 3_music_festival</span>
-                    <h3 class="scenario-title">Recherche musicale / festive (Concert &amp; Jazz)</h3>
-                    <p class="scenario-desc">🎯 <strong>Objectif :</strong> Vérifie la pertinence des suggestions musicales et des conditions en plein air.</p>
-                </div>
-                <div class="scenario-header-actions">
-                    <span class="badge badge-success" style="font-size: 0.9rem; padding: 0.4rem 0.85rem;">
-                        Correcte
-                    </span>
-                    <span class="badge badge-latency">⏱️ 21.89 s</span>
-                </div>
-            </div>
-
-            <div class="scenario-body">
-                <!-- Question utilisateur -->
-                <div class="chat-bubble user-bubble">
-                    <div class="bubble-header">👤 Question posée par l'utilisateur</div>
-                    <div class="bubble-content">« Je voudrais assister à des concerts de jazz ou des festivals de musique en plein air. »</div>
-                </div>
-
-                <!-- Comparaison côte à côte Référence Humaine vs Réponse IA -->
-                <div class="comparison-grid">
-                    <div class="ref-bubble">
-                        <div class="bubble-header">📋 Réponse annotée par l'humain (Vérité terrain / Ground Truth)</div>
-                        <div class="bubble-content"><p style="margin-bottom: 0.6rem;">Pour les amateurs de musique et de jazz en 2026, la programmation des Hauts-de-France offre de belles propositions. Notamment, la Rencontre de Jazz à Senlis (qui s&#x27;est déroulée en juin 2026) a proposé des concerts gratuits en salle et en plein air dans une ambiance conviviale. De grands concerts comme celui de Feu! Chatterton au Zénith de Lille ont également rythmé l&#x27;année 2026. Pensez à vérifier les conditions d&#x27;accès et les réservations selon les salles ou festivals.</p></div>
-                    </div>
-                    <div class="bot-bubble">
-                        <div class="bubble-header">🤖 Réponse générée par le Chatbot (Mistral AI + FAISS)</div>
-                        <div class="bubble-content"><p style="margin-bottom: 0.6rem;">Je comprends tout à fait votre envie de découvrir des concerts de jazz ou des festivals musicaux en plein air dans les Hauts-de-France pour 2026 ! Voici une sélection d’événements qui pourraient vous plaire, même si certains ont déjà eu lieu cette année. Je vous propose aussi des alternatives pour les prochaines éditions ou des suggestions similaires à explorer en 2027.</p>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;">### <strong>Événements passés en 2026 (mais inspirants pour vos futurs projets !)</strong></p>
-<p style="margin-bottom: 0.6rem;">Ces événements ont marqué l’année 2026 et pourraient vous donner envie de revenir l’année prochaine ou de découvrir des festivals similaires :</p>
-<p style="margin-bottom: 0.6rem;">1. <strong>🎷 Morty Jazz Festival – Mortefontaine (24 et 25 juillet 2026)</strong></p>
-<p style="margin-bottom: 0.6rem;">*Un incontournable pour les amateurs de jazz !*</p>
-<p style="margin-bottom: 0.6rem;">Ce festival <strong>gratuit</strong> s’était tenu dans le charmant cadre du <strong>Jardin de la Mairie de Mortefontaine</strong>, avec des concerts en plein air et même un <strong>stage de jazz</strong> pour approfondir votre passion. Les concerts étaient programmés en centre-ville ou sur les marchés, offrant une ambiance conviviale et décontractée.</p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;"><strong>Pourquoi y aller ?</strong> : Une immersion totale dans le jazz, avec des artistes locaux et une touche de folklore régional.</li>
-<li style="margin-bottom: 0.35rem;"><strong>Lien pour plus d’infos</strong> : [Morty Jazz Festival 2026](https://openagenda.com/festivals-dete/events/morty-jazz-festival)</li>
-<li style="margin-bottom: 0.35rem;"><strong>À prévoir pour 2027</strong> : Ce festival revient probablement chaque année – gardez un œil sur les annonces !</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">2. <strong>🎶 Rencontres Musicales de Cambrai (23 mai – 11 juillet 2026)</strong></p>
-<p style="margin-bottom: 0.6rem;">*Un voyage musical à travers les genres et les époques.*</p>
-<p style="margin-bottom: 0.6rem;">Ces rencontres avaient transformé Cambrai en une scène ouverte à la <strong>diversité musicale</strong>, avec des concerts en plein air, des ateliers et des découvertes pour tous les publics. Le jazz y avait trouvé sa place parmi d’autres styles, dans une ambiance festive et familiale.</p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;"><strong>Pourquoi y aller ?</strong> : Une programmation éclectique, idéale pour découvrir des artistes émergents ou des réinterprétations originales.</li>
-<li style="margin-bottom: 0.35rem;"><strong>Lien pour plus d’infos</strong> : [Rencontres Musicales de Cambrai 2026](https://openagenda.com/festivals-dete/events/rencontres-musicales-de-cambrai)</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;">### <strong>Conseils pour 2027 : Comment rester informé(e) ?</strong></p>
-<p style="margin-bottom: 0.6rem;">Malheureusement, <strong>aucun festival de jazz ou concert en plein air n’est encore programmé pour 2026</strong> dans les Hauts-de-France après le 16 septembre. Cependant, voici comment vous préparer pour l’année prochaine :</p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;"><strong>Suivez les agendas culturels</strong> :</li>
-<li style="margin-bottom: 0.35rem;">[OpenAgenda](https://openagenda.com/) (où figurent les événements passés comme le Morty Jazz Festival).</li>
-<li style="margin-bottom: 0.35rem;">Les sites des mairies des villes comme <strong>Mortefontaine, Cambrai ou Villeneuve-d’Ascq</strong>, qui organisent souvent des événements musicaux.</li>
-<li style="margin-bottom: 0.35rem;"><strong>Rejoignez des groupes Facebook</strong> ou des forums locaux dédiés aux festivals (ex : *&quot;Festivals de Jazz en Hauts-de-France&quot;*).</li>
-<li style="margin-bottom: 0.35rem;"><strong>Contactez les offices de tourisme</strong> :</li>
-<li style="margin-bottom: 0.35rem;">Par exemple, l’<strong>Office de Tourisme de l’Oise</strong> (pour Mortefontaine) ou celui du <strong>Nord</strong> (pour Villeneuve-d’Ascq/Cambrai).</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;">### <strong>Alternatives pour cet automne/hiver 2026</strong></p>
-<p style="margin-bottom: 0.6rem;">Si vous souhaitez continuer à vibrer au rythme du jazz ou de la musique live, voici quelques pistes <strong>hors festivals en plein air</strong> mais tout aussi enrichissantes :</p>
-<p style="margin-bottom: 0.6rem;">1. <strong>🎹 Concerts en salle à Lille ou Amiens</strong></p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;">Les <strong>Fêtes de la Musique</strong> (21 juin 2026) avaient proposé des concerts gospel et d’autres styles à Lille, comme celui de <strong>Impact Célébration</strong> (même s’il était terminé). Pour l’automne, vérifiez les programmations des salles comme :</li>
-<li style="margin-bottom: 0.35rem;"><strong>Le Lieu Unique</strong> (Lille) : [Programmation jazz](https://www.lelieuunique.fr/)</li>
-<li style="margin-bottom: 0.35rem;"><strong>Le Grand Théâtre de Lille</strong> : [Concerts classiques et jazz](https://www.grandtheatrelille.fr/)</li>
-<li style="margin-bottom: 0.35rem;"><strong>Exemple</strong> : Le <strong>Jazz à la Cartoucherie</strong> (Amiens) organise régulièrement des soirées jazz intimistes.</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">2. <strong>🎤 Écoles de musique et ateliers</strong></p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;">Certaines écoles proposent des <strong>concerts internes</strong> ouverts au public, comme l’<strong>École Municipale de Musique de Villeneuve-d’Ascq</strong> (où avait lieu le concert du 8 juin 2026). Renseignez-vous pour les prochaines dates !</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">3. <strong>🍷 Soirées jazz dans les bars à vin</strong></p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;">Des adresses comme <strong>Le Comptoir du Jazz</strong> (à Lille) ou <strong>Le Jazz Club de Saint-Quentin</strong> organisent des soirées régulières. Parfait pour un cadre intimiste !</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;">### <strong>Pourquoi ne pas créer votre propre événement ?</strong></p>
-<p style="margin-bottom: 0.6rem;">Si les festivals vous manquent, pourquoi ne pas :</p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;"><strong>Organiser une écoute collective</strong> chez vous ou entre amis avec une playlist jazz des années 2020 ?</li>
-<li style="margin-bottom: 0.35rem;"><strong>Participer à des jam sessions</strong> (séances d’improvisation musicale) dans des lieux comme <strong>La Belle Hortense</strong> (Lille) ou <strong>Le Bateau Ivre</strong> (Amiens) ?</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;">### <strong>En résumé</strong></p>
-<p style="margin-bottom: 0.6rem;">| Événement | Ville | Période 2026 | Type | Accès |</p>
-<p style="margin-bottom: 0.6rem;">|-----------|-------|--------------|------|-------|</p>
-<p style="margin-bottom: 0.6rem;">| Morty Jazz Festival | Mortefontaine | 24–25 juillet | Festival jazz gratuit | Plein air |</p>
-<p style="margin-bottom: 0.6rem;">| Rencontres Musicales | Cambrai | Mai–juillet | Concerts diversifiés | Gratuit/participation libre |</p>
-<p style="margin-bottom: 0.6rem;">| Concert Gospel Live | Lille | 21 juin | Concert gospel | Gratuit |</p>
-<p style="margin-bottom: 0.6rem;"><strong>Prochaine étape</strong> :</p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;"><strong>Pour 2027</strong> : Suivez les annonces des festivals comme <strong>Morty Jazz</strong> ou <strong>Rencontres Musicales de Cambrai</strong> (ils reviennent généralement chaque année).</li>
-<li style="margin-bottom: 0.35rem;"><strong>Pour cet automne</strong> : Explorez les concerts en salle ou les ateliers locaux !</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;"><strong>Dites-moi</strong> si vous souhaitez des précisions sur un type d’événement en particulier (ex : jazz acoustique, festivals familiaux, etc.), ou si vous voulez que je vous aide à contacter des organisateurs pour 2027. Je suis là pour vous guider ! 😊</p></div>
+                    <div class="scenario-header-actions">
+                        <span class="badge badge-success" style="font-size: 0.9rem; padding: 0.4rem 0.85rem;">
+                            Correcte
+                        </span>
+                        <span class="badge badge-latency">⏱️ 5.33 s</span>
                     </div>
                 </div>
 
-                <!-- Bloc d'évaluation de conformité -->
-                <div class="eval-card">
-                    <div class="eval-header">
-                        <h4 style="font-size: 1rem; color: #1e293b; font-weight: 700;">
-                            🎯 Évaluation de la réponse IA par rapport à la référence humaine
-                        </h4>
-                        <div class="eval-metrics-pills">
-                            <span class="metric-pill">Exact Match factuel : <strong>100%</strong></span>
-                            <span class="metric-pill">Similarité lexicale F1 : <strong>13.6%</strong></span>
+                <div class="scenario-body">
+                    <div class="chat-bubble user-bubble">
+                        <div class="bubble-header">👤 Question posée par l'utilisateur (très précise)</div>
+                        <div class="bubble-content">« Quelles sont les dates exactes, le lieu précis et les tarifs du festival de jazz en plein air 'Morty Jazz Festival' organisé dans l'Oise à l'été 2026 ? »</div>
+                    </div>
+
+                    <div class="comparison-grid">
+                        <div class="ref-bubble">
+                            <div class="bubble-header">📋 Réponse annotée par l'humain (Vérité terrain / Ground Truth)</div>
+                            <div class="bubble-content"><p style="margin-bottom: 0.6rem;">Le « Morty Jazz Festival » est un festival de jazz en plein air convivial et réputé dans le département de l&#x27;Oise :</p>
+<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
+<li style="margin-bottom: 0.35rem;"><strong>Lieu précis</strong> : Jardin de la Mairie, 18 Rue Corot, 60128 Mortefontaine (dans le sud de l&#x27;Oise).</li>
+<li style="margin-bottom: 0.35rem;"><strong>Dates exactes</strong> : Vendredi 24 et samedi 25 juillet 2026.</li>
+<li style="margin-bottom: 0.35rem;"><strong>Format et ambiance</strong> : Festival de jazz en plein air privilégiant les groupes régionaux et émergents, avec concerts gratuits en centre-ville et sur les marchés, stage de jazz, jam sessions et concerts assis confortablement dans des canapés en plein air. Restauration artisanale sur place.</li>
+<li style="margin-bottom: 0.35rem;"><strong>Tarif et accès</strong> : Entièrement gratuit et en accès libre pour les concerts en plein air (site officiel : https://mortyjazz.wordpress.com/).</li>
+</ul></div>
+                        </div>
+                        <div class="bot-bubble">
+                            <div class="bubble-header">🤖 Réponse générée par le Chatbot (Mistral AI + FAISS)</div>
+                            <div class="bubble-content"><p style="margin-bottom: 0.6rem;">Voici les informations <strong>exclusives et précises</strong> concernant le <strong>Morty Jazz Festival</strong> qui s&#x27;est tenu dans l&#x27;Oise en 2026 :</p>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;"><strong>🎵 Morty Jazz Festival (ex-Songes d&#x27;une Nuit de Jazz) – Édition 2026</strong></p>
+<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
+<li style="margin-bottom: 0.35rem;"><strong>Dates</strong> : <strong>24 et 25 juillet 2026</strong> (week-end complet).</li>
+<li style="margin-bottom: 0.35rem;"><strong>Lieu</strong> :</li>
+</ul>
+<p style="margin-bottom: 0.6rem;"><strong>Jardin de la Mairie – Mortefontaine</strong></p>
+<p style="margin-bottom: 0.6rem;">*Adresse complète* : <strong>18 Rue Corot, 60128 Mortefontaine</strong> (Oise).</p>
+<p style="margin-bottom: 0.6rem;">*Localisation* : À environ <strong>1h de Paris</strong>, entre Feigneux (Oise) et Mortefontaine (Aisne).</p>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;"><strong>🎟️ Tarifs et accès</strong> :</p>
+<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
+<li style="margin-bottom: 0.35rem;"><strong>Gratuit</strong> pour les <strong>concerts en plein air</strong> et les animations (marchés, jam sessions).</li>
+<li style="margin-bottom: 0.35rem;"><strong>Accès libre</strong> aux espaces publics (jardin de la mairie, marchés).</li>
+<li style="margin-bottom: 0.35rem;"><strong>Repas et boissons</strong> :</li>
+<li style="margin-bottom: 0.35rem;">Pizzas au feu de bois, hamburgers maison, plats végétariens et bières artisanales <strong>payants</strong> (prix non détaillés dans le contexte, mais proposés sur place).</li>
+<li style="margin-bottom: 0.35rem;">*Option originale* : Possibilité de s’asseoir sur des <strong>canapés</strong> pour profiter des concerts en toute confort !</li>
+</ul>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;"><strong>🎶 Programme et ambiance</strong> :</p>
+<p style="margin-bottom: 0.6rem;">Le festival, organisé par des jeunes de <strong>Feigneux et Mortefontaine</strong>, mettait à l’honneur :</p>
+<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
+<li style="margin-bottom: 0.35rem;"><strong>Des groupes régionaux</strong> (priorité locale).</li>
+<li style="margin-bottom: 0.35rem;"><strong>Des concerts gratuits</strong> en centre-ville ou sur les marchés.</li>
+<li style="margin-bottom: 0.35rem;"><strong>Animations complémentaires</strong> :</li>
+<li style="margin-bottom: 0.35rem;">Stage de jazz.</li>
+<li style="margin-bottom: 0.35rem;">Jam session.</li>
+<li style="margin-bottom: 0.35rem;">Ateliers participatifs (détails non précisés dans le contexte).</li>
+</ul>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;"><strong>📍 Accès et contacts</strong> :</p>
+<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
+<li style="margin-bottom: 0.35rem;">*Site officiel* : [Morty Jazz Festival 2026](https://openagenda.com/festivals-dete/events/morty-jazz-festival) (pour des infos complémentaires comme les horaires précis des concerts ou les artistes confirmés).</li>
+<li style="margin-bottom: 0.35rem;">*Lieu phare* : Le <strong>Jardin de la Mairie</strong> était le cœur battant de l’événement, avec une ambiance conviviale et décontractée.</li>
+</ul>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;"><strong>⚠️ Note</strong> :</p>
+<p style="margin-bottom: 0.6rem;">Cet événement a <strong>déjà eu lieu</strong> en juillet 2026. Pour des informations sur une éventuelle édition 2027, je vous invite à consulter à nouveau l’agenda culturel des Hauts-de-France ou le site officiel du festival.</p></div>
                         </div>
                     </div>
-                    <p class="eval-justif"><em>La réponse contient toutes les informations attendues et respecte fidèlement la référence annotée par l&#x27;humain.</em></p>
-                    <ul class="criteria-list">
-                        <li class='criteria-item valid'><span>✅</span> <strong>Thématique musicale / jazz / concert</strong> : <span class='matched-term'>« jazz »</span></li>
-<li class='criteria-item valid'><span>✅</span> <strong>Lieu ou ville identifiée</strong> : <span class='matched-term'>« lille »</span></li>
-<li class='criteria-item valid'><span>✅</span> <strong>Mention de l&#x27;année 2026</strong> : <span class='matched-term'>« 2026 »</span></li>
-<li class='criteria-item valid'><span>✅</span> <strong>Concordance temporelle / conditions</strong> : <span class='matched-term'>« gratuit »</span></li>
-                    </ul>
-                </div>
 
-                <!-- Sources documentaires -->
-                <details class="sources-accordion">
-                    <summary class="sources-summary">
-                        🔍 Sources documentaires FAISS exploitées (4)
-                    </summary>
-                    <div style="padding-top: 0.75rem;">
-                        
-            <table class="sources-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Événement & extrait</th>
-                        <th>Ville</th>
-                        <th>Distance L2</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    
-                <tr>
-                    <td style="width: 40px; text-align: center;"><strong>1</strong></td>
-                    <td><strong>Morty Jazz Festival</strong><br><small style="color: #64748b;">Des concerts gratuits programmés en centre-ville ou sur les marchés, mais aussi un stage de jazz,...</small></td>
-                    <td><span class="badge badge-ville">Mortefontaine</span></td>
-                    <td style="font-family: monospace;">0.2829</td>
-                    <td><a href="https://openagenda.com/festivals-dete/events/morty-jazz-festival" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a></td>
-                </tr>
-                
-                <tr>
-                    <td style="width: 40px; text-align: center;"><strong>2</strong></td>
-                    <td><strong>Concert Musiques Actuelles &amp; Jazz et Musiques Improvisées</strong><br><small style="color: #64748b;">Dans le cadre de la semaine musicale : Venez découvrir le concert des musiques actuelles &amp; jazz et musiques improvisées !...</small></td>
-                    <td><span class="badge badge-ville">Villeneuve-d&#x27;Ascq</span></td>
-                    <td style="font-family: monospace;">0.2982</td>
-                    <td><a href="https://openagenda.com/ecole-municipale-de-musique-et-de-danse-de-villeneuve-dascq/events/concert-musiques-actuelles-and-jazz-et-musiques-improvisees" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a></td>
-                </tr>
-                
-                <tr>
-                    <td style="width: 40px; text-align: center;"><strong>3</strong></td>
-                    <td><strong>Rencontres Musicales de Cambrai</strong><br><small style="color: #64748b;">Chaque début d’été, vous êtes au rendez-vous pour vivre ces instants uniques où la musique devient voyage, découverte et émerveillement....</small></td>
-                    <td><span class="badge badge-ville">Cambrai</span></td>
-                    <td style="font-family: monospace;">0.3034</td>
-                    <td><a href="https://openagenda.com/festivals-dete/events/rencontres-musicales-de-cambrai" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a></td>
-                </tr>
-                
-                <tr>
-                    <td style="width: 40px; text-align: center;"><strong>4</strong></td>
-                    <td><strong>Concert Gospel Live — Impact Célébration</strong><br><small style="color: #64748b;">Venez vivre un vrai moment de musique gospel, de joie et d’énergie collective en plein air....</small></td>
-                    <td><span class="badge badge-ville">Lille</span></td>
-                    <td style="font-family: monospace;">0.3234</td>
-                    <td><a href="https://openagenda.com/fetedelamusique2026/events/concert-gospel-live-impact-celebration" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a></td>
-                </tr>
-                
-                </tbody>
-            </table>
+                    <div class="eval-card">
+                        <div class="eval-header">
+                            <h4 style="font-size: 1.05rem; color: #1e293b; font-weight: 700;">
+                                🎯 Évaluation 100 % Autonome par le Framework Ragas
+                            </h4>
+                            <div class="eval-metrics-pills">
+                                
+                                <span class='metric-pill ragas-pill'>Ragas Answer Correctness : <strong>63.5%</strong></span>
+                                
+                                
+                                <span class='metric-pill ragas-pill'>Ragas Faithfulness : <strong>58.8%</strong></span>
+                                
+                                
+                                <span class='metric-pill ragas-pill'>Ragas Answer Relevancy : <strong>88.5%</strong></span>
+                                
+                            </div>
+                        </div>
+                        <p class="eval-justif"><em>Réponse factuellement juste et conforme aux sources (Ragas Correctness : 63.5%).</em></p>
+                    </div>
+
+                    <details class="eval-accordion">
+                        <summary class="eval-summary">
+                            💡 Comprendre les scores Ragas de ce scénario (Détail des 3 métriques)
+                        </summary>
+                        <div class="eval-accordion-content">
+                            <div class="metric-explain-box">
+                                <strong>1. Faithfulness (Fidélité au contexte) : 58.8%</strong>
+                                <p>Fidélité modérée (58.8%) : la majorité des faits reposent sur les documents, mais certaines propositions ou déductions ne sont pas explicitement vérifiables dans les extraits récupérés.</p>
+                            </div>
+                            <div class="metric-explain-box">
+                                <strong>2. Answer Correctness (Justesse factuelle vs Référence) : 63.5%</strong>
+                                <p>Justesse partielle (63.5%) : les éléments principaux sont présents, mais certains détails attendus dans la référence (horaires exacts, contacts précis ou conditions) manquent ou sont formulés différemment.</p>
+                            </div>
+                            <div class="metric-explain-box">
+                                <strong>3. Answer Relevancy (Pertinence vis-à-vis de la question) : 88.5%</strong>
+                                <p>Forte pertinence (88.5%) : le juge Ragas a rétro-généré des questions à partir de la réponse et constaté qu'elles ciblent précisément la demande initiale de l'utilisateur.</p>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details class="sources-accordion">
+                        <summary class="sources-summary">
+                            🔍 Sources documentaires FAISS exploitées (4)
+                        </summary>
+                        <div style="padding-top: 0.75rem;">
+                            
+                            <table class="sources-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Événement & extrait indexé</th>
+                                        <th>Ville</th>
+                                        <th>Distance FAISS (L2)</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;"><strong>1</strong></td>
+                                        <td><strong>Morty Jazz Festival</strong><br><small style="color: #64748b;">Des concerts gratuits programmés en centre-ville ou sur les marchés, mais aussi un stage de jazz,...</small></td>
+                                        <td><span class="badge badge-ville">Mortefontaine</span></td>
+                                        <td style="font-family: monospace;">0.3880</td>
+                                        <td>
+                                            
+                                            <a href="https://openagenda.com/festivals-dete/events/morty-jazz-festival" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a>
+                                            
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;"><strong>2</strong></td>
+                                        <td><strong>Jazz de Villes - Exposition de Jacques Grossemy avec Tourcoing Jazz</strong><br><small style="color: #64748b;">À l’occasion des 40 ans du Tourcoing Jazz Festival et des 25 ans de Jazz en Nord, le forum culturel de La Source accueille l’exposition‘‘JAZZ de VILLES’’....</small></td>
+                                        <td><span class="badge badge-ville">Roncq</span></td>
+                                        <td style="font-family: monospace;">0.3884</td>
+                                        <td>
+                                            
+                                            <a href="https://openagenda.com/la-source-roncq/events/jazz-de-villes-exposition-de-jacques-grossemy-avec-tourcoing-jazz" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a>
+                                            
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;"><strong>3</strong></td>
+                                        <td><strong>Villeneuve Jazz Big Band - Fête de la Musique 2026</strong><br><small style="color: #64748b;">Dimanche 21 juin, à 16h, pour la fête de la musique 2026, le Villeneuve Jazz Big Band vous invite à l'espace Rose des Vents pour un voyage entre swing, latin jazz et funk....</small></td>
+                                        <td><span class="badge badge-ville">Villeneuve-d'Ascq</span></td>
+                                        <td style="font-family: monospace;">0.3939</td>
+                                        <td>
+                                            
+                                            <a href="https://openagenda.com/agenda-culturel-de-villeneuve-dascq/events/villeneuve-jazz-big-band-fete-de-la-musique-2026" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a>
+                                            
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;"><strong>4</strong></td>
+                                        <td><strong>Festival des Forêts 2026</strong><br><small style="color: #64748b;">Rendez-vous estival incontournable, le Festival des Forêts proposera du 21 juin au 12 juillet 2026, une 34e édition mettant à l’honneur la musique classique en forêts....</small></td>
+                                        <td><span class="badge badge-ville">Compiègne</span></td>
+                                        <td style="font-family: monospace;">0.3842</td>
+                                        <td>
+                                            
+                                            <a href="https://openagenda.com/compiegne-and-oise/events/festival-des-forets-2026" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a>
+                                            
+                                        </td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                            
+                        </div>
+                    </details>
+                </div>
+            </div>
             
+            <div class="scenario-card" id="scenario-4_geographic_target">
+                <div class="scenario-header">
+                    <div>
+                        <span class="scenario-badge">Scénario 4_geographic_target</span>
+                        <h3 class="scenario-title">Recherche patrimoniale ciblée (La Nuit des cathédrales à Lille)</h3>
+                        <p class="scenario-desc">🎯 <strong>Objectif :</strong> Vérifie la restitution précise de l'événement nocturne patrimonial à la Cathédrale de la Treille à Lille.</p>
                     </div>
-                </details>
-            </div>
-        </div>
-        
-
-        <div class="scenario-card" id="scenario-4_geographic_target">
-            <div class="scenario-header">
-                <div>
-                    <span class="scenario-badge">Scénario 4_geographic_target</span>
-                    <h3 class="scenario-title">Recherche géographique spécifique (Lille &amp; Oise)</h3>
-                    <p class="scenario-desc">🎯 <strong>Objectif :</strong> Vérifie la prise en compte des critères géographiques dans les métadonnées.</p>
-                </div>
-                <div class="scenario-header-actions">
-                    <span class="badge badge-success" style="font-size: 0.9rem; padding: 0.4rem 0.85rem;">
-                        Correcte
-                    </span>
-                    <span class="badge badge-latency">⏱️ 14.32 s</span>
-                </div>
-            </div>
-
-            <div class="scenario-body">
-                <!-- Question utilisateur -->
-                <div class="chat-bubble user-bubble">
-                    <div class="bubble-header">👤 Question posée par l'utilisateur</div>
-                    <div class="bubble-content">« Quels événements ou spectacles sont programmés dans la métropole lilloise ou dans l&#x27;Oise ? »</div>
-                </div>
-
-                <!-- Comparaison côte à côte Référence Humaine vs Réponse IA -->
-                <div class="comparison-grid">
-                    <div class="ref-bubble">
-                        <div class="bubble-header">📋 Réponse annotée par l'humain (Vérité terrain / Ground Truth)</div>
-                        <div class="bubble-content"><p style="margin-bottom: 0.6rem;">Dans la métropole lilloise et le département de l&#x27;Oise, de nombreux événements sont inscrits à l&#x27;agenda 2026. À Lille et ses environs, vous retrouvez des grands concerts au Zénith (comme Feu! Chatterton) ainsi que des ateliers numériques et expositions culturelles. Dans l&#x27;Oise, des villes comme Senlis accueillent des rendez-vous musicaux de jazz réputés, tandis que Crépy-en-Valois et les communes environnantes proposent des sorties culturelles et patrimoniales variées tout au long de l&#x27;année 2026.</p></div>
-                    </div>
-                    <div class="bot-bubble">
-                        <div class="bubble-header">🤖 Réponse générée par le Chatbot (Mistral AI + FAISS)</div>
-                        <div class="bubble-content"><p style="margin-bottom: 0.6rem;">Voici une sélection d&#x27;événements captivants qui se dérouleront <strong>en 2026</strong> dans la métropole lilloise ou dans l&#x27;Oise (notamment à Laon), parfaits pour découvrir la richesse culturelle et artistique de ces territoires :</p>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;">### <strong>📍 Métropole lilloise</strong></p>
-<p style="margin-bottom: 0.6rem;">*(Aucun événement culturel ou spectacle n&#x27;est programmé dans le contexte fourni pour Lille en 2026, <strong>hors événements emploi</strong> déjà mentionnés précédemment. Cependant, voici une alternative artistique proche dans l&#x27;Oise :)*</p>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;">### <strong>📍 Oise – Laon</strong></p>
-<p style="margin-bottom: 0.6rem;"><strong>🎭 *La Maison des Arts et Loisirs vous ouvre ses portes</strong>*</p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;"><strong>Titre</strong> : *La Maison des Arts et Loisirs vous ouvre ses portes à Laon*</li>
-<li style="margin-bottom: 0.35rem;"><strong>Lieu</strong> : Maison des Arts et Loisirs, <strong>2 Place Aubry, 02000 Laon</strong></li>
-<li style="margin-bottom: 0.35rem;"><strong>Dates</strong> : <strong>Samedi 19 et dimanche 20 septembre 2026</strong> *(week-end complet !)*</li>
-<li style="margin-bottom: 0.35rem;"><strong>Pourquoi y aller ?</strong></li>
-<li style="margin-bottom: 0.35rem;">Une <strong>programmation pluridisciplinaire</strong> exceptionnelle : théâtre, musiques, humour, marionnettes, danse, cirque… et même des <strong>expositions d’art contemporain</strong> ! Un vrai voyage artistique pour tous les publics.</li>
-<li style="margin-bottom: 0.35rem;">Un lieu <strong>accessible et convivial</strong>, idéal pour une sortie en famille, entre amis ou en solo.</li>
-<li style="margin-bottom: 0.35rem;"><strong>Tarifs</strong> : Les informations précises ne sont pas encore disponibles sur le lien officiel, mais généralement, les événements sont adaptés à différents budgets (certains sont gratuits ou à prix libre).</li>
-<li style="margin-bottom: 0.35rem;"><strong>Lien officiel</strong> : [La Maison des Arts et Loisirs à Laon](https://openagenda.com/culture/events/la-maison-des-arts-et-loisirs-vous-ouvre-ses-portes-a-laon)</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;">### <strong>💡 Pourquoi choisir cet événement ?</strong></p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;"><strong>Diversité</strong> : Que vous soyez amateur de spectacle vivant, d’art contemporain ou simplement curieux, ce week-end offre une <strong>multiplicité d’expériences</strong> en un lieu unique.</li>
-<li style="margin-bottom: 0.35rem;"><strong>Ambiance festive</strong> : Les portes ouvertes créent une <strong>atmosphère chaleureuse</strong>, propice aux rencontres et aux découvertes.</li>
-<li style="margin-bottom: 0.35rem;"><strong>Proximité</strong> : Situé à seulement <strong>1h de Lille</strong> (en voiture ou en train), c’est une escapade idéale pour une journée ou un week-end culturel.</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;">### <strong>🔍 Pas d’autres événements culturels à Lille en 2026 ?</strong></p>
-<p style="margin-bottom: 0.6rem;">Malheureusement, <strong>aucun autre spectacle ou événement culturel</strong> n’est répertorié dans le contexte fourni pour la métropole lilloise <strong>en 2026</strong> (hors les événements emploi déjà cités). Cependant, je vous invite à consulter régulièrement :</p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;">Le site <strong>[Planlibre](https://openagenda.com/planlibre)</strong> (pour les événements culturels lillois).</li>
-<li style="margin-bottom: 0.35rem;">Les programmes des <strong>théâtres et salles de spectacle</strong> comme le <strong>La Comédie de Lille</strong> ou le <strong>Zénith de Lille</strong> (souvent riches en concerts et spectacles).</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">---</p>
-<p style="margin-bottom: 0.6rem;">### <strong>🎯 Besoin d’autres idées ?</strong></p>
-<p style="margin-bottom: 0.6rem;">Si vous cherchez des <strong>événements thématiques</strong> (ex : musique, danse, expositions), des <strong>festivals</strong> ou des <strong>rencontres</strong>, je peux vous orienter vers :</p>
-<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
-<li style="margin-bottom: 0.35rem;">Les <strong>Journées Européennes du Patrimoine</strong> (septembre 2026, souvent riches en Hauts-de-France).</li>
-<li style="margin-bottom: 0.35rem;">Les <strong>festivals d’été</strong> (comme le <strong>Festival de la Chanson de Carcassonne</strong>, si vous êtes ouvert à d’autres régions proches).</li>
-</ul>
-<p style="margin-bottom: 0.6rem;">N’hésitez pas à préciser vos centres d’intérêt pour que je puisse affiner les suggestions ! 😊</p></div>
+                    <div class="scenario-header-actions">
+                        <span class="badge badge-success" style="font-size: 0.9rem; padding: 0.4rem 0.85rem;">
+                            Correcte
+                        </span>
+                        <span class="badge badge-latency">⏱️ 6.05 s</span>
                     </div>
                 </div>
 
-                <!-- Bloc d'évaluation de conformité -->
-                <div class="eval-card">
-                    <div class="eval-header">
-                        <h4 style="font-size: 1rem; color: #1e293b; font-weight: 700;">
-                            🎯 Évaluation de la réponse IA par rapport à la référence humaine
-                        </h4>
-                        <div class="eval-metrics-pills">
-                            <span class="metric-pill">Exact Match factuel : <strong>100%</strong></span>
-                            <span class="metric-pill">Similarité lexicale F1 : <strong>9.6%</strong></span>
+                <div class="scenario-body">
+                    <div class="chat-bubble user-bubble">
+                        <div class="bubble-header">👤 Question posée par l'utilisateur (très précise)</div>
+                        <div class="bubble-content">« Quels sont les détails (date, lieu exact, tarif et programme) de 'La Nuit des cathédrales 2026' organisée à Lille ? »</div>
+                    </div>
+
+                    <div class="comparison-grid">
+                        <div class="ref-bubble">
+                            <div class="bubble-header">📋 Réponse annotée par l'humain (Vérité terrain / Ground Truth)</div>
+                            <div class="bubble-content"><p style="margin-bottom: 0.6rem;">« La Nuit des cathédrales - 2026 » est un événement culturel et patrimonial majeur organisé à Lille :</p>
+<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
+<li style="margin-bottom: 0.35rem;"><strong>Lieu exact</strong> : Cathédrale Notre-Dame de la Treille, Place Gilleson, 59000 Lille (Nord).</li>
+<li style="margin-bottom: 0.35rem;"><strong>Date et horaire</strong> : Samedi 9 mai 2026 à partir de 18h30 (en nocturne à la tombée du soleil).</li>
+<li style="margin-bottom: 0.35rem;"><strong>Programme culturel</strong> : Mise en lumière nocturne de la cathédrale, concerts de musique sacrée et profane, visites guidées du patrimoine et de la crypte néogothique, spectacles vivants et expositions.</li>
+<li style="margin-bottom: 0.35rem;"><strong>Tarif</strong> : Événement en accès libre et entièrement gratuit pour tous les publics.</li>
+</ul></div>
+                        </div>
+                        <div class="bot-bubble">
+                            <div class="bubble-header">🤖 Réponse générée par le Chatbot (Mistral AI + FAISS)</div>
+                            <div class="bubble-content"><p style="margin-bottom: 0.6rem;">Voici les détails complets de <strong>La Nuit des cathédrales 2026</strong> qui s&#x27;est tenue à Lille :</p>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;"><strong>Titre</strong> : La Nuit des cathédrales - 2026</p>
+<p style="margin-bottom: 0.6rem;"><strong>Lieu</strong> : Cathédrale Notre-Dame de la Treille</p>
+<p style="margin-bottom: 0.6rem;"><strong>Adresse</strong> : Place Gilleson, 59800 Lille (Nord)</p>
+<p style="margin-bottom: 0.6rem;"><strong>Date</strong> : Samedi 9 mai 2026, de <strong>18h30 à minuit</strong> (événement terminé)</p>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;">### <strong>Conditions d&#x27;accès &amp; Tarifs</strong></p>
+<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
+<li style="margin-bottom: 0.35rem;"><strong>Accès libre</strong> (pas de réservation nécessaire).</li>
+</ul>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;">### <strong>Programme détaillé</strong></p>
+<p style="margin-bottom: 0.6rem;">La cathédrale était illuminée à la bougie pour une soirée exceptionnelle mêlant musique, danse et découverte patrimoniale. Voici le déroulé précis :</p>
+<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
+<li style="margin-bottom: 0.35rem;"><strong>18h30</strong> : <strong>Festival des Grandes Orgues de Notre-Dame de la Treille</strong></li>
+<li style="margin-bottom: 0.35rem;">Interprété par <strong>Sylvain Heili</strong> (professeur au Conservatoire de Lille).</li>
+<li style="margin-bottom: 0.35rem;">Œuvres au programme : Franck, Pierné, Brahms, Vierne et Dupré.</li>
+<li style="margin-bottom: 0.35rem;">*Partenariat* : Les Amis de la Cathédrale ND de la Treille.</li>
+</ul>
+<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
+<li style="margin-bottom: 0.35rem;"><strong>20h00</strong> : <strong>L&#x27;Orgue qui danse !</strong></li>
+<li style="margin-bottom: 0.35rem;">Spectacle chorégraphié par <strong>Insolit’A Danse</strong> (dirigé par Laureline Mialon).</li>
+<li style="margin-bottom: 0.35rem;">Programme musical et dansé :</li>
+<li style="margin-bottom: 0.35rem;">*Apparition de l&#x27;Église éternelle* (Olivier Messiaen)</li>
+<li style="margin-bottom: 0.35rem;">*Boléro de Concert* (Lefébure-Wely)</li>
+<li style="margin-bottom: 0.35rem;">*Passacaille* (Bach)</li>
+<li style="margin-bottom: 0.35rem;">*3 danses* (Jehan Alain)</li>
+<li style="margin-bottom: 0.35rem;">Accompagnement à l&#x27;orgue par <strong>C. Massimo</strong>.</li>
+</ul>
+<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
+<li style="margin-bottom: 0.35rem;"><strong>20h30 – 22h30</strong> : <strong>Découverte de la Crypte Néogothique</strong></li>
+<li style="margin-bottom: 0.35rem;">Visite guidée par <strong>Les Amis de la Cathédrale ND de la Treille</strong>.</li>
+<li style="margin-bottom: 0.35rem;">*Accès* : Depuis le Transept Sud (prévoir une file d’attente, places limitées).</li>
+</ul>
+<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
+<li style="margin-bottom: 0.35rem;"><strong>21h00</strong> : <strong>Vivaldi-Express</strong> avec <strong>Quinte&amp;sens</strong> (dirigé par Olivier Molendi-Coste)</li>
+<li style="margin-bottom: 0.35rem;">Médley musical inspiré de *Harry Potter* (J. Williams, P. Doyle) et œuvres de Vivaldi, Beethoven, Einaudi, Morricone, etc.</li>
+<li style="margin-bottom: 0.35rem;">*Formation* : Septuor incluant violon, violoncelle, piano, hautbois et basson.</li>
+</ul>
+<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
+<li style="margin-bottom: 0.35rem;"><strong>22h30</strong> : <strong>Gloria, polyphonies transversales</strong></li>
+<li style="margin-bottom: 0.35rem;">Direction de <strong>Sylvain Manet</strong> avec les chanteurs <strong>C. Meens, B. Charlery, R. Claudel</strong>.</li>
+<li style="margin-bottom: 0.35rem;">Célébration mystique et vibrante mêlant polyphonies traditionnelles et contemporaines.</li>
+</ul>
+<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
+<li style="margin-bottom: 0.35rem;"><strong>23h30</strong> : <strong>Office des Complies</strong></li>
+<li style="margin-bottom: 0.35rem;">Chanté par le <strong>Père Bruno Mary</strong>, Recteur de la Basilique-cathédrale.</li>
+</ul>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;">### <strong>À noter</strong></p>
+<ul style="margin: 0.5rem 0 0.75rem 1.5rem; padding: 0;">
+<li style="margin-bottom: 0.35rem;">L’événement a mis en valeur la <strong>façade translucide contemporaine</strong> de la cathédrale, contrastant avec son style néo-gothique.</li>
+<li style="margin-bottom: 0.35rem;">*Erreur corrigée* : Le programme initial imprimé contenait une erreur (version officielle disponible sur le lien officiel).</li>
+</ul>
+<p style="margin-bottom: 0.6rem;">---</p>
+<p style="margin-bottom: 0.6rem;"><strong>Lien officiel</strong> pour plus d’informations :</p>
+<p style="margin-bottom: 0.6rem;">[La Nuit des cathédrales 2026](https://openagenda.com/planlibre/events/la-nuit-des-cathedrales-2026)</p></div>
                         </div>
                     </div>
-                    <p class="eval-justif"><em>La réponse contient toutes les informations attendues et respecte fidèlement la référence annotée par l&#x27;humain.</em></p>
-                    <ul class="criteria-list">
-                        <li class='criteria-item valid'><span>✅</span> <strong>Prise en compte de Lille / métropole lilloise</strong> : <span class='matched-term'>« lille »</span></li>
-<li class='criteria-item valid'><span>✅</span> <strong>Prise en compte de l&#x27;Oise / communes de l&#x27;Oise</strong> : <span class='matched-term'>« oise »</span></li>
-<li class='criteria-item valid'><span>✅</span> <strong>Mention de l&#x27;année 2026</strong> : <span class='matched-term'>« 2026 »</span></li>
-<li class='criteria-item valid'><span>✅</span> <strong>Types d&#x27;événements cités</strong> : <span class='matched-term'>« concert »</span></li>
-                    </ul>
-                </div>
 
-                <!-- Sources documentaires -->
-                <details class="sources-accordion">
-                    <summary class="sources-summary">
-                        🔍 Sources documentaires FAISS exploitées (4)
-                    </summary>
-                    <div style="padding-top: 0.75rem;">
-                        
-            <table class="sources-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Événement & extrait</th>
-                        <th>Ville</th>
-                        <th>Distance L2</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    
-                <tr>
-                    <td style="width: 40px; text-align: center;"><strong>1</strong></td>
-                    <td><strong>Opportunités Emploi</strong><br><small style="color: #64748b;">Découvrez les événements emploi de la métropole lilloise du mois de septembre !...</small></td>
-                    <td><span class="badge badge-ville">Lille</span></td>
-                    <td style="font-family: monospace;">0.2998</td>
-                    <td><a href="https://openagenda.com/francetravail/events/opportunites-emploi" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a></td>
-                </tr>
-                
-                <tr>
-                    <td style="width: 40px; text-align: center;"><strong>2</strong></td>
-                    <td><strong>La place de l&#x27;emploi</strong><br><small style="color: #64748b;">Un événement unique sur la métropole lilloise pour rencontrer des employeurs et des centres de formation ! Participez à notre nouvelle édition de la place de l&#x27;emploi !...</small></td>
-                    <td><span class="badge badge-ville">Haubourdin</span></td>
-                    <td style="font-family: monospace;">0.3166</td>
-                    <td><a href="https://openagenda.com/francetravail/events/la-place-de-lemploi-7831864" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a></td>
-                </tr>
-                
-                <tr>
-                    <td style="width: 40px; text-align: center;"><strong>3</strong></td>
-                    <td><strong>La Maison des Arts et Loisirs vous ouvre ses portes à Laon</strong><br><small style="color: #64748b;">Avec une programmation pluridisciplinaire d’une quarantaine d&#x27;événements artistiques par an, (théâtre, musiques, humour, marionnettes, danse, cirque…), ses expositions d’art contem...</small></td>
-                    <td><span class="badge badge-ville">Laon</span></td>
-                    <td style="font-family: monospace;">0.3196</td>
-                    <td><a href="https://openagenda.com/culture/events/la-maison-des-arts-et-loisirs-vous-ouvre-ses-portes-a-laon" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a></td>
-                </tr>
-                
-                <tr>
-                    <td style="width: 40px; text-align: center;"><strong>4</strong></td>
-                    <td><strong>La Nuit des cathédrales - 2026</strong><br><small style="color: #64748b;">Dans le cadre de cet événement européen, la Cathédrale de Lille vous accueille à la tombée du soleil pour vous faire (re)découvrir ce lieu emblématique avec une programmation riche...</small></td>
-                    <td><span class="badge badge-ville">Lille</span></td>
-                    <td style="font-family: monospace;">0.3297</td>
-                    <td><a href="https://openagenda.com/planlibre/events/la-nuit-des-cathedrales-2026" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a></td>
-                </tr>
-                
-                </tbody>
-            </table>
+                    <div class="eval-card">
+                        <div class="eval-header">
+                            <h4 style="font-size: 1.05rem; color: #1e293b; font-weight: 700;">
+                                🎯 Évaluation 100 % Autonome par le Framework Ragas
+                            </h4>
+                            <div class="eval-metrics-pills">
+                                
+                                <span class='metric-pill ragas-pill'>Ragas Answer Correctness : <strong>56.9%</strong></span>
+                                
+                                
+                                <span class='metric-pill ragas-pill'>Ragas Faithfulness : <strong>82.1%</strong></span>
+                                
+                                
+                                <span class='metric-pill ragas-pill'>Ragas Answer Relevancy : <strong>89.6%</strong></span>
+                                
+                            </div>
+                        </div>
+                        <p class="eval-justif"><em>Réponse factuellement juste et conforme aux sources (Ragas Correctness : 56.9%).</em></p>
+                    </div>
+
+                    <details class="eval-accordion">
+                        <summary class="eval-summary">
+                            💡 Comprendre les scores Ragas de ce scénario (Détail des 3 métriques)
+                        </summary>
+                        <div class="eval-accordion-content">
+                            <div class="metric-explain-box">
+                                <strong>1. Faithfulness (Fidélité au contexte) : 82.1%</strong>
+                                <p>Excellente fidélité (82.1%) : Ragas a décomposé la réponse en affirmations atomiques et validé que la quasi-totalité des faits cités (lieu, dates 2026, tarifs, programme) sont directement étayés par le contexte documentaire sans aucune hallucination.</p>
+                            </div>
+                            <div class="metric-explain-box">
+                                <strong>2. Answer Correctness (Justesse factuelle vs Référence) : 56.9%</strong>
+                                <p>Justesse partielle (56.9%) : les éléments principaux sont présents, mais certains détails attendus dans la référence (horaires exacts, contacts précis ou conditions) manquent ou sont formulés différemment.</p>
+                            </div>
+                            <div class="metric-explain-box">
+                                <strong>3. Answer Relevancy (Pertinence vis-à-vis de la question) : 89.6%</strong>
+                                <p>Forte pertinence (89.6%) : le juge Ragas a rétro-généré des questions à partir de la réponse et constaté qu'elles ciblent précisément la demande initiale de l'utilisateur.</p>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details class="sources-accordion">
+                        <summary class="sources-summary">
+                            🔍 Sources documentaires FAISS exploitées (4)
+                        </summary>
+                        <div style="padding-top: 0.75rem;">
+                            
+                            <table class="sources-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Événement & extrait indexé</th>
+                                        <th>Ville</th>
+                                        <th>Distance FAISS (L2)</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;"><strong>1</strong></td>
+                                        <td><strong>La Nuit des églises - 2026 à la Cathédrale de Lille</strong><br><small style="color: #64748b;">Dans le cadre de l'édition 2026 de cet événement national, la Cathédrale de Lille vous accueille en nocturne à la lueur de la bougie avec une programmation riche et éclectique....</small></td>
+                                        <td><span class="badge badge-ville">Lille</span></td>
+                                        <td style="font-family: monospace;">0.1973</td>
+                                        <td>
+                                            
+                                            <a href="https://openagenda.com/planlibre/events/la-nuit-des-eglises-2025-a-la-cathedrale-de-lille" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a>
+                                            
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;"><strong>2</strong></td>
+                                        <td><strong>La Nuit des cathédrales - 2026</strong><br><small style="color: #64748b;">Dans le cadre de cet événement européen, la Cathédrale de Lille vous accueille à la tombée du soleil pour vous faire (re)découvrir ce lieu emblématique avec une programmation riche...</small></td>
+                                        <td><span class="badge badge-ville">Lille</span></td>
+                                        <td style="font-family: monospace;">0.2538</td>
+                                        <td>
+                                            
+                                            <a href="https://openagenda.com/planlibre/events/la-nuit-des-cathedrales-2026" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a>
+                                            
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;"><strong>3</strong></td>
+                                        <td><strong>La Fête de la musique 2026 à la Treille - Partie #1</strong><br><small style="color: #64748b;">Dans le cadre de l'édition 2026 de la Fête de la musique, la Basilique-cathédrale de Lille est heureuse d'accueillir la classe d'orgue du Conservatoire de Lille pour une audition....</small></td>
+                                        <td><span class="badge badge-ville">Lille</span></td>
+                                        <td style="font-family: monospace;">0.2667</td>
+                                        <td>
+                                            
+                                            <a href="https://openagenda.com/planlibre/events/la-fete-de-la-musique-2026-a-la-treille-1" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a>
+                                            
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;"><strong>4</strong></td>
+                                        <td><strong>Luminiscence Lille #2 - L'Odyssée Céleste</strong><br><small style="color: #64748b;">Après le succès de sa première édition, LUMINISCENCE revient à Lille, au cœur de la majestueuse Cathédrale Notre-Dame de la Treille, pour présenter son tout nouveau spectacle....</small></td>
+                                        <td><span class="badge badge-ville">Lille</span></td>
+                                        <td style="font-family: monospace;">0.3141</td>
+                                        <td>
+                                            
+                                            <a href="https://openagenda.com/planlibre/events/luminiscence-lille-2-lodyssee-celeste" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a>
+                                            
+                                        </td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                            
+                        </div>
+                    </details>
+                </div>
+            </div>
             
+            <div class="scenario-card" id="scenario-5_out_of_scope">
+                <div class="scenario-header">
+                    <div>
+                        <span class="scenario-badge">Scénario 5_out_of_scope</span>
+                        <h3 class="scenario-title">Cas limite / Hors périmètre (Anti-hallucination & Rebond)</h3>
+                        <p class="scenario-desc">🎯 <strong>Objectif :</strong> Vérifie le refus poli de la demande hors-sujet, le rappel strict du périmètre régional 2026 et la réorientation vers les ateliers locaux.</p>
                     </div>
-                </details>
-            </div>
-        </div>
-        
-
-        <div class="scenario-card" id="scenario-5_out_of_scope">
-            <div class="scenario-header">
-                <div>
-                    <span class="scenario-badge">Scénario 5_out_of_scope</span>
-                    <h3 class="scenario-title">Cas limite / Hors périmètre (Anti-hallucination)</h3>
-                    <p class="scenario-desc">🎯 <strong>Objectif :</strong> Vérifie que le bot refuse poliment sans inventer d&#x27;événements et rappelle son périmètre.</p>
-                </div>
-                <div class="scenario-header-actions">
-                    <span class="badge badge-success" style="font-size: 0.9rem; padding: 0.4rem 0.85rem;">
-                        Correcte
-                    </span>
-                    <span class="badge badge-latency">⏱️ 2.76 s</span>
-                </div>
-            </div>
-
-            <div class="scenario-body">
-                <!-- Question utilisateur -->
-                <div class="chat-bubble user-bubble">
-                    <div class="bubble-header">👤 Question posée par l'utilisateur</div>
-                    <div class="bubble-content">« Peux-tu m&#x27;expliquer comment réparer un moteur de voiture à Marseille ? »</div>
-                </div>
-
-                <!-- Comparaison côte à côte Référence Humaine vs Réponse IA -->
-                <div class="comparison-grid">
-                    <div class="ref-bubble">
-                        <div class="bubble-header">📋 Réponse annotée par l'humain (Vérité terrain / Ground Truth)</div>
-                        <div class="bubble-content"><p style="margin-bottom: 0.6rem;">Je suis désolé, mais ma mission est exclusivement dédiée aux recommandations de sorties, spectacles et événements culturels publics pour l&#x27;année 2026 dans la région Hauts-de-France. Votre demande concerne la mécanique automobile à Marseille, ce qui sort totalement de mon périmètre. Je vous invite à consulter un professionnel de la réparation automobile ou un guide adapté.</p></div>
-                    </div>
-                    <div class="bot-bubble">
-                        <div class="bubble-header">🤖 Réponse générée par le Chatbot (Mistral AI + FAISS)</div>
-                        <div class="bubble-content"><p style="margin-bottom: 0.6rem;">Je suis désolé, mais mon rôle est de vous accompagner dans la découverte des événements culturels et publics <strong>uniquement dans les Hauts-de-France pour l&#x27;année 2026</strong>. Malheureusement, je ne peux pas vous aider pour des sujets comme la réparation mécanique dans une autre région comme Marseille.</p>
-<p style="margin-bottom: 0.6rem;">Si vous souhaitez des conseils pour des <strong>ateliers pratiques, des expositions ou des événements liés à l&#x27;artisanat, à la mécanique ou à la réparation</strong> dans les Hauts-de-France en 2026, je serais ravi de vous orienter ! Par exemple, des ateliers de bricolage, de vélo ou d’électroménager pourraient vous intéresser.</p>
-<p style="margin-bottom: 0.6rem;">N’hésitez pas à préciser votre demande, et je vous guiderai avec plaisir ! 😊</p></div>
+                    <div class="scenario-header-actions">
+                        <span class="badge badge-success" style="font-size: 0.9rem; padding: 0.4rem 0.85rem;">
+                            Correcte
+                        </span>
+                        <span class="badge badge-latency">⏱️ 1.84 s</span>
                     </div>
                 </div>
 
-                <!-- Bloc d'évaluation de conformité -->
-                <div class="eval-card">
-                    <div class="eval-header">
-                        <h4 style="font-size: 1rem; color: #1e293b; font-weight: 700;">
-                            🎯 Évaluation de la réponse IA par rapport à la référence humaine
-                        </h4>
-                        <div class="eval-metrics-pills">
-                            <span class="metric-pill">Exact Match factuel : <strong>100%</strong></span>
-                            <span class="metric-pill">Similarité lexicale F1 : <strong>39.0%</strong></span>
+                <div class="scenario-body">
+                    <div class="chat-bubble user-bubble">
+                        <div class="bubble-header">👤 Question posée par l'utilisateur (très précise)</div>
+                        <div class="bubble-content">« Peux-tu m'expliquer pas à pas comment démonter et réparer le moteur d'une Peugeot 206 dans un garage solidaire à Marseille ? »</div>
+                    </div>
+
+                    <div class="comparison-grid">
+                        <div class="ref-bubble">
+                            <div class="bubble-header">📋 Réponse annotée par l'humain (Vérité terrain / Ground Truth)</div>
+                            <div class="bubble-content"><p style="margin-bottom: 0.6rem;">Je suis désolé, mais en tant qu&#x27;assistant spécialisé exclusivement dans les sorties et événements culturels et de loisirs en région Hauts-de-France pour l&#x27;année 2026, cette demande sort de mon périmètre d&#x27;action.</p>
+<p style="margin-bottom: 0.6rem;">Je ne peux pas vous fournir de tutoriel de mécanique automobile ni d&#x27;adresses de garages à Marseille. Pour réparer votre véhicule, je vous recommande de faire appel à un garagiste professionnel, de consulter la Revue Technique Automobile (RTA) ou de contacter un garage solidaire associatif en région Provence-Alpes-Côte d&#x27;Azur.</p>
+<p style="margin-bottom: 0.6rem;">En revanche, si vous recherchez des événements ou ateliers participatifs de bricolage et de réparation dans les Hauts-de-France en 2026 (comme les Ateliers d&#x27;aide à la réparation de vélos à Nogent-sur-Oise ou des Repair Cafés régionaux), n&#x27;hésitez pas à me demander !</p></div>
+                        </div>
+                        <div class="bot-bubble">
+                            <div class="bubble-header">🤖 Réponse générée par le Chatbot (Mistral AI + FAISS)</div>
+                            <div class="bubble-content"><p style="margin-bottom: 0.6rem;">Je suis désolé, mais mon périmètre d&#x27;expertise se limite strictement aux <strong>événements culturels, événements publics et sorties dans les Hauts-de-France pour l&#x27;année 2026</strong>. Je ne peux donc pas vous fournir d&#x27;informations sur des ateliers de mécanique ou des garages solidaires en dehors de cette région, ni sur des démontages ou réparations spécifiques à des modèles de voitures comme la Peugeot 206.</p>
+<p style="margin-bottom: 0.6rem;">Cependant, si vous cherchez des <strong>ateliers participatifs ou des initiatives locales</strong> dans les Hauts-de-France pour apprendre la mécanique ou réparer des vélos, je peux vous orienter vers des structures comme les <strong>Repair Cafés</strong> ou des ateliers d&#x27;entraide mécanique organisés par des associations. Souhaitez-vous que je vous propose des alternatives dans ce domaine ? 😊</p>
+<p style="margin-bottom: 0.6rem;">*(Pour Marseille ou d&#x27;autres régions, je vous conseille de contacter directement des garages solidaires ou des associations locales spécialisées.)*</p></div>
                         </div>
                     </div>
-                    <p class="eval-justif"><em>La réponse contient toutes les informations attendues et respecte fidèlement la référence annotée par l&#x27;humain.</em></p>
-                    <ul class="criteria-list">
-                        <li class='criteria-item valid'><span>✅</span> <strong>Refus poli explicite</strong> : <span class='matched-term'>« désolé »</span></li>
-<li class='criteria-item valid'><span>✅</span> <strong>Rappel du périmètre (Hauts-de-France / événements 2026)</strong> : <span class='matched-term'>« hauts-de-france »</span></li>
-<li class='criteria-item valid'><span>✅</span> <strong>Anti-hallucination (pas de réparation à Marseille)</strong> : <span class='matched-term'>« marseille »</span></li>
-                    </ul>
-                </div>
 
-                <!-- Sources documentaires -->
-                <details class="sources-accordion">
-                    <summary class="sources-summary">
-                        🔍 Sources documentaires FAISS exploitées (1)
-                    </summary>
-                    <div style="padding-top: 0.75rem;">
-                        
-            <table class="sources-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Événement & extrait</th>
-                        <th>Ville</th>
-                        <th>Distance L2</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    
-                <tr>
-                    <td style="width: 40px; text-align: center;"><strong>1</strong></td>
-                    <td><strong>Atelier d&#x27;aide à la réparation - Nogent-sur-Oise</strong><br><small style="color: #64748b;">Toute le monde est bienvenu à notre atelier d&#x27;aide à la réparation. Si votre vélo a besoin de m...</small></td>
-                    <td><span class="badge badge-ville">Nogent-sur-Oise</span></td>
-                    <td style="font-family: monospace;">0.3643</td>
-                    <td><a href="https://openagenda.com/velooise/events/atelier-daide-a-la-reparation-nogent-sur-oise-303182" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a></td>
-                </tr>
-                
-                </tbody>
-            </table>
-            
+                    <div class="eval-card">
+                        <div class="eval-header">
+                            <h4 style="font-size: 1.05rem; color: #1e293b; font-weight: 700;">
+                                🎯 Évaluation 100 % Autonome par le Framework Ragas
+                            </h4>
+                            <div class="eval-metrics-pills">
+                                
+                                <span class='metric-pill ragas-pill'>Ragas Answer Correctness : <strong>62.7%</strong></span>
+                                
+                                
+                                <span class='metric-pill ragas-pill' title='Les refus hors périmètre n&#39;ont pas de source à ancrer'>Ragas Faithfulness : <strong>N/A (Hors périmètre)</strong></span>
+                                
+                                
+                                <span class='metric-pill ragas-pill'>Ragas Answer Relevancy : <strong>0.0%</strong></span>
+                                
+                            </div>
+                        </div>
+                        <p class="eval-justif"><em>Refus cadré et réorientation validés par Ragas (Answer Correctness : 62.7%).</em></p>
                     </div>
-                </details>
+
+                    <details class="eval-accordion">
+                        <summary class="eval-summary">
+                            💡 Comprendre les scores Ragas de ce scénario (Détail des 3 métriques)
+                        </summary>
+                        <div class="eval-accordion-content">
+                            <div class="metric-explain-box">
+                                <strong>1. Faithfulness (Fidélité au contexte) : N/A*</strong>
+                                <p>Demande hors périmètre (refus poli) : la fidélité documentaire est non applicable (N/A) car le chatbot ne doit invoquer aucun événement du catalogue régional pour une question hors domaine.</p>
+                            </div>
+                            <div class="metric-explain-box">
+                                <strong>2. Answer Correctness (Justesse factuelle vs Référence) : 62.7%</strong>
+                                <p>Justesse du refus (62.7%) : Ragas valide la conformité du refus avec la référence humaine (rappel du périmètre régional Hauts-de-France 2026 et réorientation courtoise).</p>
+                            </div>
+                            <div class="metric-explain-box">
+                                <strong>3. Answer Relevancy (Pertinence vis-à-vis de la question) : 0.0%</strong>
+                                <p>Score de pertinence (0.0%) : sur un refus hors périmètre, Ragas applique fréquemment la pénalité « noncommittal » si la réponse indique une impossibilité de répondre au sujet initial.</p>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details class="sources-accordion">
+                        <summary class="sources-summary">
+                            🔍 Sources documentaires FAISS exploitées (4)
+                        </summary>
+                        <div style="padding-top: 0.75rem;">
+                            
+                            <table class="sources-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Événement & extrait indexé</th>
+                                        <th>Ville</th>
+                                        <th>Distance FAISS (L2)</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;"><strong>1</strong></td>
+                                        <td><strong>JOB Dating NORAUTO Pont Ste Maxence</strong><br><small style="color: #64748b;">Ton moteur ? Ton appétence pour la mécanique et ta curiosité. Notre carburant ? Notre envie de t'embarquer au sein d'une équipe enthousiaste et partager des moments collectifs....</small></td>
+                                        <td><span class="badge badge-ville">Creil</span></td>
+                                        <td style="font-family: monospace;">0.3512</td>
+                                        <td>
+                                            
+                                            <a href="https://openagenda.com/francetravail/events/job-dating-norauto-pont-ste-maxence" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a>
+                                            
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;"><strong>2</strong></td>
+                                        <td><strong>FISA recrute des Opérateurs(ices) de Fabrication débutants</strong><br><small style="color: #64748b;">Vous êtes bon bricoleur, savez faire preuve de dextérité et avez des connaissances de bases en informatique?...</small></td>
+                                        <td><span class="badge badge-ville">Armentières</span></td>
+                                        <td style="font-family: monospace;">0.3717</td>
+                                        <td>
+                                            
+                                            <a href="https://openagenda.com/francetravail/events/fisa-recrute-des-operateursices-de-fabrication-debutants" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a>
+                                            
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;"><strong>3</strong></td>
+                                        <td><strong>Devenez mécanicien automobile : Formation et opportunités à saisir !</strong><br><small style="color: #64748b;">Vous êtes passionné par la mécanique automobile et souhaitez en faire votre métier ? Cette réunion d'information est faite pour vous !...</small></td>
+                                        <td><span class="badge badge-ville">Nogent-sur-Oise</span></td>
+                                        <td style="font-family: monospace;">0.3769</td>
+                                        <td>
+                                            
+                                            <a href="https://openagenda.com/francetravail/events/devenez-mecanicien-automobile-formation-et-opportunites-a-saisir" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a>
+                                            
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;"><strong>4</strong></td>
+                                        <td><strong>Découvrez la formation Conseiller Clientèle après vente automobile (CCAV) en alternance pour une rentrée 2026 réussie</strong><br><small style="color: #64748b;">Vous êtes à la recherche d'une formation en alternance dans le domaine de l'automobile ?...</small></td>
+                                        <td><span class="badge badge-ville">Carvin</span></td>
+                                        <td style="font-family: monospace;">0.3800</td>
+                                        <td>
+                                            
+                                            <a href="https://openagenda.com/francetravail/events/decouvrez-la-formation-conseiller-clientele-apres-vente-automobile-ccav-en-alternance-pour-une-rentree-2026-reussie" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a>
+                                            
+                                        </td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                            
+                        </div>
+                    </details>
+                </div>
             </div>
-        </div>
-        
+            
         </section>
 
-        <!-- Pied de page -->
         <footer>
-            <p>Rapport d'évaluation généré automatiquement • Système RAG LangChain + Mistral AI + FAISS • Hauts-de-France 2026</p>
-            <p style="margin-top: 0.25rem;">Horodatage de génération : 16/09/2026 à 23:00:49</p>
+            <p>Rapport d'évaluation généré automatiquement • Système RAG LangChain + Mistral AI + FAISS + Ragas • Hauts-de-France 2026</p>
+            <p style="margin-top: 0.25rem;">Horodatage de génération : 19/09/2026 à 00:32:11</p>
         </footer>
     </div>
 </body>

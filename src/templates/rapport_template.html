@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport d'Évaluation Ragas - {{ formatted_date }}</title>
+    <style>
+        :root {
+            --primary: #1e40af;
+            --primary-hover: #1d4ed8;
+            --accent: #eff6ff;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --success: #16a34a;
+            --success-bg: #dcfce7;
+            --warning: #b45309;
+            --warning-bg: #fef3c7;
+            --danger: #b91c1c;
+            --danger-bg: #fee2e2;
+            --purple: #7c3aed;
+            --purple-bg: #f3e8ff;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1240px;
+            margin: 0 auto;
+        }
+
+        .header-card {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: white;
+            border-radius: 14px;
+            padding: 2.25rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.2);
+        }
+
+        .header-title {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-subtitle {
+            font-size: 1.05rem;
+            color: #dbeafe;
+            margin-bottom: 1.5rem;
+        }
+
+        .meta-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .meta-tag {
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 0.4rem 0.9rem;
+            border-radius: 9999px;
+            font-size: 0.88rem;
+            font-weight: 500;
+        }
+
+        .meta-tag.highlight-date {
+            background: #ffffff;
+            color: #1e3a8a;
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.35rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        .kpi-label {
+            font-size: 0.80rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .kpi-value {
+            font-size: 1.85rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-top: 0.35rem;
+        }
+
+        .kpi-subtext {
+            font-size: 0.80rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .section-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.92rem;
+        }
+
+        th, td {
+            padding: 0.85rem 0.9rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: var(--accent);
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .badge-success {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+
+        .badge-danger {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .badge-source {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .badge-ville {
+            background: #e0f2fe;
+            color: #0369a1;
+            font-weight: 600;
+        }
+
+        .badge-latency {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            color: #64748b;
+        }
+
+        .ragas-tag {
+            background: var(--purple-bg);
+            color: var(--purple);
+            font-weight: 700;
+            padding: 0.2rem 0.55rem;
+            border-radius: 6px;
+            font-size: 0.82rem;
+        }
+
+        .scenario-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .scenario-header {
+            background: #fafbfc;
+            border-bottom: 1px solid var(--border);
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .scenario-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.35rem;
+        }
+
+        .scenario-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .scenario-desc {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .scenario-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .scenario-body {
+            padding: 1.5rem;
+        }
+
+        .chat-bubble {
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .bubble-header {
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-bubble {
+            background: #f1f5f9;
+            border-left: 4px solid #64748b;
+        }
+
+        .user-bubble .bubble-header {
+            color: #475569;
+        }
+
+        .user-bubble .bubble-content {
+            font-size: 1.02rem;
+            font-weight: 500;
+            color: #1e293b;
+            font-style: italic;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        @media (max-width: 900px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .ref-bubble {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid #0284c7;
+            border-radius: 10px;
+            padding: 1.25rem;
+        }
+
+        .ref-bubble .bubble-header {
+            color: #0369a1;
+        }
+
+        .ref-bubble .bubble-content {
+            font-size: 0.92rem;
+            color: #334155;
+        }
+
+        .bot-bubble {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-left: 4px solid #2563eb;
+            border-radius: 10px;
+            padding: 1.25rem;
+        }
+
+        .bot-bubble .bubble-header {
+            color: #1d4ed8;
+        }
+
+        .bot-bubble .bubble-content {
+            font-size: 0.92rem;
+            color: #1e293b;
+        }
+
+        .eval-card {
+            background: #fcfcfc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .eval-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .eval-metrics-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .metric-pill {
+            background: #e2e8f0;
+            color: #334155;
+            padding: 0.25rem 0.65rem;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 500;
+        }
+
+        .metric-pill strong {
+            color: #0f172a;
+        }
+
+        .ragas-pill {
+            background: var(--purple-bg);
+            color: var(--purple);
+        }
+
+        .ragas-pill strong {
+            color: var(--purple);
+        }
+
+        .eval-justif {
+            font-size: 0.88rem;
+            color: #475569;
+        }
+
+        .eval-accordion {
+            background: #faf5ff;
+            border: 1px solid #e9d5ff;
+            border-radius: 10px;
+            margin-bottom: 1.25rem;
+            overflow: hidden;
+        }
+
+        .eval-summary {
+            background: #f3e8ff;
+            color: #6b21a8;
+            font-weight: 700;
+            padding: 0.85rem 1.25rem;
+            cursor: pointer;
+            font-size: 0.92rem;
+            display: flex;
+            align-items: center;
+            user-select: none;
+        }
+
+        .eval-summary:hover {
+            background: #ebd5ff;
+        }
+
+        .eval-accordion-content {
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .metric-explain-box {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #7c3aed;
+            border-radius: 8px;
+            padding: 0.85rem 1.1rem;
+        }
+
+        .metric-explain-box strong {
+            color: #1e293b;
+            font-size: 0.92rem;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-explain-box p {
+            color: #475569;
+            font-size: 0.87rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .sources-accordion {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.85rem 1.25rem;
+        }
+
+        .sources-summary {
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .sources-table {
+            margin-top: 0.75rem;
+            font-size: 0.86rem;
+        }
+
+        .sources-table th {
+            background: #e2e8f0;
+            color: #334155;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .sources-table td {
+            padding: 0.5rem 0.75rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header-card">
+            <h1 class="header-title">🏛️ Rapport d'Évaluation Ragas - Chatbot RAG</h1>
+            <p class="header-subtitle">Banc d'essai de validation rigoureuse et automatisée à 100 % par le framework Ragas (Mistral AI + FAISS HNSW)</p>
+            <div class="meta-tags">
+                <span class="meta-tag highlight-date">📅 Date d'exécution : {{ formatted_date }}</span>
+                <span class="meta-tag">⏱️ Durée totale : {{ total_duration }} s</span>
+                <span class="meta-tag">🤖 Modèle : {{ model_name }}</span>
+                <span class="meta-tag">🗄️ VectorStore : FAISS HNSW</span>
+                <span class="meta-tag">🔬 Juge : Ragas 0.4 (Claims &amp; Semantic)</span>
+            </div>
+        </header>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Scénarios Évalués</div>
+                <div class="kpi-value">{{ total_scenarios }} / {{ total_scenarios }}</div>
+                <div class="kpi-subtext">5 questions très précises</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Taux de Conformité</div>
+                <div class="kpi-value" style="color: var(--success);">{{ correct_rate }}%</div>
+                <div class="kpi-subtext">{{ correct_count }} Correctes, {{ partial_count }} Partielles, {{ incorrect_count }} Incorrectes</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Ragas Correctness Moyen</div>
+                <div class="kpi-value" style="color: var(--purple);">{{ ragas_corr_str }}</div>
+                <div class="kpi-subtext">Justesse factuelle vs vérité terrain</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Ragas Faithfulness Moyen</div>
+                <div class="kpi-value" style="color: var(--purple);">{{ ragas_faith_str }}</div>
+                <div class="kpi-subtext">Fidélité au contexte documentaire</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Ragas Relevancy Moyen</div>
+                <div class="kpi-value" style="color: var(--purple);">{{ ragas_relev_str }}</div>
+                <div class="kpi-subtext">Pertinence directe de réponse</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Latence Moyenne</div>
+                <div class="kpi-value">{{ avg_latency }} s</div>
+                <div class="kpi-subtext">Par scénario interactif</div>
+            </div>
+        </div>
+
+        <section class="section-card">
+            <h2 class="section-title">📊 Synthèse de l'Évaluation 100% Ragas</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Scénario testé</th>
+                            <th>Correctness</th>
+                            <th>Faithfulness</th>
+                            <th>Relevancy</th>
+                            <th>Classification</th>
+                            <th>Latence</th>
+                            <th>Sources</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in results %}
+                        <tr>
+                            <td><strong>#{{ r.id }}</strong></td>
+                            <td><a href="#scenario-{{ r.id }}" style="color: #1d4ed8; text-decoration: none; font-weight: 600;">{{ r.nom }}</a></td>
+                            <td><span class="ragas-tag">{{ r.corr_str }}</span></td>
+                            <td><span class="ragas-tag">{{ r.faith_str }}</span></td>
+                            <td><span class="ragas-tag">{{ r.relev_str }}</span></td>
+                            <td><span class="badge {{ r.badge_class }}">{{ r.classification }}</span></td>
+                            <td>{{ "%.2f"|format(r.latency) }} s</td>
+                            <td><span class="badge badge-source">{{ r.sources|length }} docs</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.75rem;">
+                * <em>Note : Pour les requêtes hors périmètre (refus poli et cadré), la fidélité documentaire (Faithfulness) est N/A car aucune source documentaire n'est invoquée. Le score moyen de Faithfulness est calculé sur l'ensemble des scénarios dans le périmètre documentaire.</em>
+            </p>
+        </section>
+
+        <section>
+            <h2 class="section-title" style="margin-bottom: 1.5rem;">📝 Analyse Détaillée par Scénario</h2>
+            {% for r in results %}
+            <div class="scenario-card" id="scenario-{{ r.id }}">
+                <div class="scenario-header">
+                    <div>
+                        <span class="scenario-badge">Scénario {{ r.id }}</span>
+                        <h3 class="scenario-title">{{ r.nom }}</h3>
+                        <p class="scenario-desc">🎯 <strong>Objectif :</strong> {{ r.description }}</p>
+                    </div>
+                    <div class="scenario-header-actions">
+                        <span class="badge {{ r.badge_class }}" style="font-size: 0.9rem; padding: 0.4rem 0.85rem;">
+                            {{ r.classification }}
+                        </span>
+                        <span class="badge badge-latency">⏱️ {{ "%.2f"|format(r.latency) }} s</span>
+                    </div>
+                </div>
+
+                <div class="scenario-body">
+                    <div class="chat-bubble user-bubble">
+                        <div class="bubble-header">👤 Question posée par l'utilisateur (très précise)</div>
+                        <div class="bubble-content">« {{ r.question }} »</div>
+                    </div>
+
+                    <div class="comparison-grid">
+                        <div class="ref-bubble">
+                            <div class="bubble-header">📋 Réponse annotée par l'humain (Vérité terrain / Ground Truth)</div>
+                            <div class="bubble-content">{{ r.reponse_reference_html | safe }}</div>
+                        </div>
+                        <div class="bot-bubble">
+                            <div class="bubble-header">🤖 Réponse générée par le Chatbot (Mistral AI + FAISS)</div>
+                            <div class="bubble-content">{{ r.answer_html | safe }}</div>
+                        </div>
+                    </div>
+
+                    <div class="eval-card">
+                        <div class="eval-header">
+                            <h4 style="font-size: 1.05rem; color: #1e293b; font-weight: 700;">
+                                🎯 Évaluation 100 % Autonome par le Framework Ragas
+                            </h4>
+                            <div class="eval-metrics-pills">
+                                {% if r.ragas.answer_correctness is not none %}
+                                <span class='metric-pill ragas-pill'>Ragas Answer Correctness : <strong>{{ r.corr_str }}</strong></span>
+                                {% endif %}
+                                {% if r.is_out_of_scope %}
+                                <span class='metric-pill ragas-pill' title='Les refus hors périmètre n&#39;ont pas de source à ancrer'>Ragas Faithfulness : <strong>N/A (Hors périmètre)</strong></span>
+                                {% elif r.ragas.faithfulness is not none %}
+                                <span class='metric-pill ragas-pill'>Ragas Faithfulness : <strong>{{ r.faith_str }}</strong></span>
+                                {% endif %}
+                                {% if r.ragas.answer_relevancy is not none %}
+                                <span class='metric-pill ragas-pill'>Ragas Answer Relevancy : <strong>{{ r.relev_str }}</strong></span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <p class="eval-justif"><em>{{ r.justification }}</em></p>
+                    </div>
+
+                    <details class="eval-accordion">
+                        <summary class="eval-summary">
+                            💡 Comprendre les scores Ragas de ce scénario (Détail des 3 métriques)
+                        </summary>
+                        <div class="eval-accordion-content">
+                            <div class="metric-explain-box">
+                                <strong>1. Faithfulness (Fidélité au contexte) : {{ r.faith_str }}</strong>
+                                <p>{{ r.faith_explain }}</p>
+                            </div>
+                            <div class="metric-explain-box">
+                                <strong>2. Answer Correctness (Justesse factuelle vs Référence) : {{ r.corr_str }}</strong>
+                                <p>{{ r.corr_explain }}</p>
+                            </div>
+                            <div class="metric-explain-box">
+                                <strong>3. Answer Relevancy (Pertinence vis-à-vis de la question) : {{ r.relev_str }}</strong>
+                                <p>{{ r.relev_explain }}</p>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details class="sources-accordion">
+                        <summary class="sources-summary">
+                            🔍 Sources documentaires FAISS exploitées ({{ r.sources|length }})
+                        </summary>
+                        <div style="padding-top: 0.75rem;">
+                            {% if r.sources %}
+                            <table class="sources-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Événement & extrait indexé</th>
+                                        <th>Ville</th>
+                                        <th>Distance FAISS (L2)</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for s in r.sources %}
+                                    <tr>
+                                        <td style="width: 40px; text-align: center;"><strong>{{ loop.index }}</strong></td>
+                                        <td><strong>{{ s.titre }}</strong><br><small style="color: #64748b;">{{ s.description_preview }}</small></td>
+                                        <td><span class="badge badge-ville">{{ s.ville }}</span></td>
+                                        <td style="font-family: monospace;">{{ "%.4f"|format(s.score_distance) }}</td>
+                                        <td>
+                                            {% if s.url %}
+                                            <a href="{{ s.url }}" target="_blank" rel="noopener noreferrer" style="color: #2563eb; font-weight: 500;">Lien officiel ↗</a>
+                                            {% else %}
+                                            <span style="color: #94a3b8;">Non disponible</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <p style="color: #64748b; font-style: italic; margin-top: 0.5rem;">Aucune source documentaire requise (requête hors périmètre gérée par filtre anti-hallucination).</p>
+                            {% endif %}
+                        </div>
+                    </details>
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+
+        <footer>
+            <p>Rapport d'évaluation généré automatiquement • Système RAG LangChain + Mistral AI + FAISS + Ragas • Hauts-de-France 2026</p>
+            <p style="margin-top: 0.25rem;">Horodatage de génération : {{ formatted_date }}</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistant RAG • Sorties & Culture Hauts-de-France 2026</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎭</text></svg>">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --primary-border: #bfdbfe;
+            --bg-page: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --user-bubble: #2563eb;
+            --user-text: #ffffff;
+            --bot-bubble: #ffffff;
+            --bot-border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* En-tête */
+        header {
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            box-shadow: var(--shadow-sm);
+            z-index: 10;
+        }
+
+        .header-title-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+            line-height: 1;
+        }
+
+        .title-text h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .title-text p {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            background-color: #f1f5f9;
+            color: #334155;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--success);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        .btn-icon {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            color: #475569;
+            padding: 0.45rem 0.85rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.15s ease-in-out;
+            text-decoration: none;
+        }
+
+        .btn-icon:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            color: var(--text-main);
+        }
+
+        /* Zone de conversation */
+        main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            max-width: 960px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Carte d'accueil */
+        .welcome-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .welcome-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e3a8a;
+        }
+
+        .welcome-card p {
+            font-size: 0.92rem;
+            color: #475569;
+            line-height: 1.55;
+            margin-bottom: 1.25rem;
+        }
+
+        .suggestion-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.6rem;
+        }
+
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .chip {
+            background: var(--primary-light);
+            border: 1px solid var(--primary-border);
+            color: var(--primary);
+            padding: 0.4rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .chip:hover {
+            background: #dbeafe;
+            transform: translateY(-1px);
+        }
+
+        /* Bulles de messages */
+        .message-row {
+            display: flex;
+            gap: 0.75rem;
+            width: 100%;
+        }
+
+        .message-row.user {
+            justify-content: flex-end;
+        }
+
+        .message-row.bot {
+            justify-content: flex-start;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .avatar.bot {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            color: #ffffff;
+        }
+
+        .avatar.user {
+            background: linear-gradient(135deg, #475569, #334155);
+            color: #ffffff;
+        }
+
+        .message-content {
+            max-width: 80%;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .user .bubble {
+            background-color: var(--user-bubble);
+            color: var(--user-text);
+            padding: 0.85rem 1.15rem;
+            border-radius: 18px 18px 4px 18px;
+            font-size: 0.94rem;
+            line-height: 1.5;
+            box-shadow: var(--shadow-sm);
+            word-break: break-word;
+        }
+
+        .bot .bubble {
+            background-color: var(--bot-bubble);
+            color: var(--text-main);
+            padding: 1.15rem 1.35rem;
+            border-radius: 18px 18px 18px 4px;
+            font-size: 0.94rem;
+            line-height: 1.6;
+            border: 1px solid var(--bot-border);
+            box-shadow: var(--shadow-sm);
+            word-break: break-word;
+        }
+
+        .bubble strong {
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .user .bubble strong {
+            color: #ffffff;
+        }
+
+        .bubble p {
+            margin-bottom: 0.65rem;
+        }
+
+        .bubble p:last-child {
+            margin-bottom: 0;
+        }
+
+        .bubble ul {
+            margin: 0.4rem 0 0.75rem 1.25rem;
+            padding: 0;
+        }
+
+        .bubble li {
+            margin-bottom: 0.35rem;
+        }
+
+        /* Méta infos & Sources */
+        .message-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.73rem;
+            color: var(--text-muted);
+            padding: 0 0.35rem;
+        }
+
+        .latency-pill {
+            background: #f1f5f9;
+            padding: 0.15rem 0.45rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .sources-accordion {
+            margin-top: 0.65rem;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-sm);
+            background: #f8fafc;
+            overflow: hidden;
+        }
+
+        .sources-header {
+            padding: 0.5rem 0.85rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+            background: #f1f5f9;
+        }
+
+        .sources-header:hover {
+            background: #e2e8f0;
+        }
+
+        .sources-list {
+            padding: 0.6rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            display: none;
+        }
+
+        .sources-list.open {
+            display: flex;
+        }
+
+        .source-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 0.65rem 0.85rem;
+            font-size: 0.8rem;
+        }
+
+        .source-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .source-title {
+            font-weight: 700;
+            color: #1e3a8a;
+        }
+
+        .source-badges {
+            display: flex;
+            gap: 0.35rem;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .badge-city {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        .badge-score {
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 500;
+        }
+
+        .source-desc {
+            color: #64748b;
+            font-size: 0.76rem;
+            line-height: 1.4;
+            margin-bottom: 0.4rem;
+        }
+
+        .source-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.74rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .source-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Indicateur de saisie / chargement */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.85rem 1.15rem;
+            background: #ffffff;
+            border: 1px solid var(--bot-border);
+            border-radius: 18px 18px 18px 4px;
+            width: fit-content;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .typing-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background-color: #94a3b8;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-5px); opacity: 1; }
+        }
+
+        /* Barre de saisie */
+        footer {
+            background-color: var(--bg-card);
+            border-top: 1px solid var(--border-color);
+            padding: 1rem 1.5rem 1.25rem;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
+            z-index: 10;
+        }
+
+        .input-container {
+            max-width: 960px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .input-box-wrapper {
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: var(--radius-md);
+            padding: 0.35rem 0.5rem 0.35rem 1rem;
+            box-shadow: var(--shadow-sm);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .input-box-wrapper:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        #questionInput {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            background: transparent;
+            font-family: inherit;
+        }
+
+        #questionInput::placeholder {
+            color: #94a3b8;
+        }
+
+        .send-button {
+            background-color: var(--primary);
+            color: #ffffff;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 0.6rem 1.15rem;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.15s ease;
+            flex-shrink: 0;
+        }
+
+        .send-button:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+        }
+
+        .send-button:disabled {
+            background-color: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        .input-subline {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            padding: 0 0.35rem;
+        }
+
+        .input-subline-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .topk-selector {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .topk-selector select {
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            padding: 0.15rem 0.4rem;
+            font-size: 0.74rem;
+            background: #ffffff;
+            color: #334155;
+            outline: none;
+        }
+
+        /* Modal d'administration / Rebuild */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(2px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 1rem;
+        }
+
+        .modal-backdrop.open {
+            display: flex;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 480px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            animation: modal-enter 0.2s ease-out;
+        }
+
+        @keyframes modal-enter {
+            from { opacity: 0; transform: scale(0.96) translateY(8px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-header h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: #94a3b8;
+        }
+
+        .modal-close:hover {
+            color: var(--text-main);
+        }
+
+        .modal-body {
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            font-size: 0.88rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.82rem;
+            color: #334155;
+        }
+
+        .form-group select,
+        .form-group input {
+            border: 1px solid #cbd5e1;
+            border-radius: var(--radius-sm);
+            padding: 0.5rem 0.75rem;
+            font-size: 0.88rem;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            border-color: var(--primary);
+        }
+
+        .modal-footer {
+            padding: 0.85rem 1.25rem;
+            background: #f8fafc;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            color: #475569;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border: none;
+            color: #ffffff;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .rebuild-result {
+            padding: 0.65rem 0.85rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.82rem;
+            display: none;
+        }
+
+        .rebuild-result.success {
+            display: block;
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .rebuild-result.error {
+            display: block;
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #1e293b;
+            color: #ffffff;
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            box-shadow: var(--shadow-lg);
+            z-index: 200;
+            display: none;
+            animation: toast-in 0.2s ease;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        @keyframes toast-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- En-tête -->
+    <header>
+        <div class="header-title-group">
+            <span class="logo-icon">🎭</span>
+            <div class="title-text">
+                <h1>Sorties & Culture Hauts-de-France 2026</h1>
+                <p>Assistant conversationnel RAG (FAISS + Mistral AI)</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <span class="status-badge" id="statusBadge" title="État de connexion de l'API">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="statusText">Connexion...</span>
+            </span>
+            <button class="btn-icon" id="openSettingsBtn" title="Recharger la base ou ajuster les paramètres">
+                ⚙️ <span style="display: inline-block;">Rebuild</span>
+            </button>
+            <a href="/docs" target="_blank" class="btn-icon" title="Ouvrir la documentation Swagger OpenAPI">
+                📖 <span>Swagger</span> ↗
+            </a>
+        </div>
+    </header>
+
+    <!-- Zone principale de conversation -->
+    <main id="chatContainer">
+        <div class="welcome-card" id="welcomeCard">
+            <div class="welcome-header">
+                <span style="font-size: 1.5rem;">👋</span>
+                <h2>Bienvenue sur votre conseiller culturel régional !</h2>
+            </div>
+            <p>
+                Posez vos questions sur les spectacles, festivals de jazz, expositions, ateliers numériques et animations familiales
+                programmés en <strong>Hauts-de-France en 2026</strong>. Les réponses sont directement générées et sourcées
+                à partir de la base de données vectorielle indexée dans FAISS.
+            </p>
+            <div class="suggestion-title">Exemples de questions suggérées :</div>
+            <div class="suggestion-chips">
+                <button class="chip" onclick="applySuggestion('Je cherche un atelier pour m\'initier au numérique et à l\'informatique.')">
+                    💻 Atelier numérique débutant
+                </button>
+                <button class="chip" onclick="applySuggestion('Quelles activités nature ou ludiques sont adaptées aux familles avec enfants ?')">
+                    🌿 Sortie nature en famille
+                </button>
+                <button class="chip" onclick="applySuggestion('Je voudrais assister à des concerts de jazz ou festivals en plein air cet été.')">
+                    🎷 Concerts & Jazz en plein air
+                </button>
+                <button class="chip" onclick="applySuggestion('Quels événements sont prévus à Lille ou dans le département de l\'Oise ?')">
+                    📍 Événements à Lille & Oise
+                </button>
+                <button class="chip" onclick="applySuggestion('Peux-tu m\'expliquer comment réparer un moteur de voiture à Marseille ?')">
+                    🛡️ Test anti-hallucination
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Barre inférieure de saisie -->
+    <footer>
+        <div class="input-container">
+            <form id="chatForm" onsubmit="handleFormSubmit(event)">
+                <div class="input-box-wrapper">
+                    <input
+                        type="text"
+                        id="questionInput"
+                        placeholder="Posez votre question (ex: Quels concerts sont prévus en plein air en juillet 2026 ?)..."
+                        autocomplete="off"
+                        required
+                    />
+                    <button type="submit" class="send-button" id="sendBtn">
+                        <span>Envoyer</span> ➤
+                    </button>
+                </div>
+            </form>
+            <div class="input-subline">
+                <div class="input-subline-left">
+                    <div class="topk-selector">
+                        <label for="topKSelect">Sources à extraire (Top-K) :</label>
+                        <select id="topKSelect">
+                            <option value="2">2 sources</option>
+                            <option value="4" selected>4 sources (standard)</option>
+                            <option value="6">6 sources</option>
+                            <option value="8">8 sources</option>
+                        </select>
+                    </div>
+                    <span id="modelInfo">🤖 Modèle : open-mistral-nemo</span>
+                </div>
+                <div>
+                    <button onclick="clearChat()" style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 0.74rem;">
+                        🗑️ Effacer l'historique
+                    </button>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal Paramètres & Rebuild -->
+    <div class="modal-backdrop" id="settingsModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>⚙️ Administration de la Base Vectorielle</h3>
+                <button class="modal-close" onclick="closeSettingsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="indexTypeSelect">Type d'index FAISS :</label>
+                    <select id="indexTypeSelect">
+                        <option value="hnsw" selected>HNSW Flat (Rapide ~0.5ms - Recommandé)</option>
+                        <option value="flat">Flat L2 (Recherche exacte ~16ms)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="adminKeyInput">Clé d'administration (X-Admin-Key) :</label>
+                    <input type="password" id="adminKeyInput" placeholder="Optionnel en mode local libre">
+                    <small style="color: #64748b; font-size: 0.74rem;">Requis uniquement si la variable ADMIN_API_KEY est activée sur le serveur.</small>
+                </div>
+                <div class="rebuild-result" id="rebuildResult"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeSettingsModal()">Fermer</button>
+                <button class="btn-primary" id="rebuildSubmitBtn" onclick="openConfirmRebuildModal()">
+                    🔄 Recharger l'index
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Popup de Confirmation Rebuild -->
+    <div class="modal-backdrop" id="confirmRebuildModal" style="z-index: 120;">
+        <div class="modal-card" style="max-width: 440px;">
+            <div class="modal-header" style="background: #fffbeb; border-bottom: 1px solid #fef3c7;">
+                <h3 style="color: #92400e; display: flex; align-items: center; gap: 0.5rem; font-size: 1rem;">
+                    <span>⚠️</span> Confirmation requise
+                </h3>
+                <button class="modal-close" onclick="closeConfirmRebuildModal()">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 1.25rem; font-size: 0.88rem; line-height: 1.5; color: #334155;">
+                <p style="font-weight: 600; color: #1e293b; margin-bottom: 0.5rem;">
+                    Êtes-vous sûr de vouloir recharger ou reconstruire la base vectorielle FAISS ?
+                </p>
+                <p style="color: #64748b; font-size: 0.82rem; margin: 0;">
+                    Cette action va réinitialiser l'index vectoriel en mémoire du serveur et recharger les documents. Ce processus peut prendre quelques instants.
+                </p>
+            </div>
+            <div class="modal-footer" style="background: #fafafa; padding: 0.75rem 1.25rem;">
+                <button class="btn-secondary" onclick="closeConfirmRebuildModal()">Annuler</button>
+                <button class="btn-primary" id="confirmRebuildExecBtn" style="background: #d97706;" onclick="confirmAndExecuteRebuild()">
+                    Confirmer et lancer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Variables globales
+        const API_BASE = window.location.origin;
+        let isGenerating = false;
+
+        // Éléments DOM
+        const chatContainer = document.getElementById("chatContainer");
+        const questionInput = document.getElementById("questionInput");
+        const sendBtn = document.getElementById("sendBtn");
+        const topKSelect = document.getElementById("topKSelect");
+        const statusBadge = document.getElementById("statusBadge");
+        const statusText = document.getElementById("statusText");
+        const statusDot = document.getElementById("statusDot");
+        const modelInfo = document.getElementById("modelInfo");
+        const welcomeCard = document.getElementById("welcomeCard");
+        const settingsModal = document.getElementById("settingsModal");
+        const confirmRebuildModal = document.getElementById("confirmRebuildModal");
+        const openSettingsBtn = document.getElementById("openSettingsBtn");
+        const rebuildResult = document.getElementById("rebuildResult");
+        const rebuildSubmitBtn = document.getElementById("rebuildSubmitBtn");
+        const toast = document.getElementById("toast");
+
+        // Formatage Markdown léger vers HTML sécurisé
+        function formatMarkdown(text) {
+            if (!text) return "";
+            let html = text
+                // Échappement HTML basique
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                // Gras
+                .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                // Italique
+                .replace(/\*(.*?)\*/g, "<em>$1</em>")
+                // Titres markdown (# Titre)
+                .replace(/^### (.*$)/gim, "<h4 style='margin: 0.5rem 0 0.25rem 0; font-size: 0.95rem; font-weight: 700;'>$1</h4>")
+                .replace(/^## (.*$)/gim, "<h3 style='margin: 0.6rem 0 0.3rem 0; font-size: 1rem; font-weight: 700;'>$1</h3>");
+
+            // Conversion des listes hiérarchiques à 2 niveaux
+            const lines = html.split("\n");
+            let level = 0; // 0: hors liste, 1: niveau 1 (ul > li), 2: sous-liste (ul > li > ul > li)
+            let resultLines = [];
+
+            function closeToLevel(target) {
+                while (level > target) {
+                    resultLines.push("</li></ul>");
+                    level--;
+                }
+            }
+
+            for (let rawLine of lines) {
+                const trimmed = rawLine.trim();
+                if (!trimmed) {
+                    closeToLevel(0);
+                    continue;
+                }
+
+                if (trimmed.startsWith("---") || trimmed.startsWith("___")) {
+                    closeToLevel(0);
+                    resultLines.push("<hr style='border: none; border-top: 1px solid var(--border); margin: 0.8rem 0;'>");
+                    continue;
+                }
+
+                const bulletMatch = rawLine.match(/^(\s*)([-*•]|\d+\.)\s+(.*)$/);
+                if (bulletMatch) {
+                    const indent = bulletMatch[1].replace(/\t/g, "  ").length;
+                    const content = bulletMatch[3].trim();
+
+                    if (indent >= 2) {
+                        if (level === 0) {
+                            resultLines.push("<ul style='margin: 0.4rem 0 0.6rem 1.25rem; padding: 0;'><li style='margin-bottom: 0.3rem;'><ul style='margin: 0.2rem 0 0.35rem 1.2rem; padding: 0; list-style-type: circle;'>");
+                            level = 2;
+                        } else if (level === 1) {
+                            resultLines.push("<ul style='margin: 0.2rem 0 0.35rem 1.2rem; padding: 0; list-style-type: circle;'>");
+                            level = 2;
+                        } else if (level === 2) {
+                            resultLines.push("</li>");
+                        }
+                        resultLines.push(`<li style='margin-bottom: 0.25rem;'>${content}`);
+                    } else {
+                        closeToLevel(1);
+                        if (level === 1) {
+                            resultLines.push("</li>");
+                        } else if (level === 0) {
+                            resultLines.push("<ul style='margin: 0.4rem 0 0.6rem 1.25rem; padding: 0;'>");
+                            level = 1;
+                        }
+                        resultLines.push(`<li style='margin-bottom: 0.35rem;'>${content}`);
+                    }
+                    continue;
+                }
+
+                const indentMatch = rawLine.match(/^(\s{2,})(.*)$/);
+                if (indentMatch && level > 0) {
+                    const subContent = indentMatch[2].trim();
+                    if (subContent) {
+                        if (level === 1) {
+                            resultLines.push("<ul style='margin: 0.2rem 0 0.35rem 1.2rem; padding: 0; list-style-type: circle;'>");
+                            level = 2;
+                        } else if (level === 2) {
+                            resultLines.push("</li>");
+                        }
+                        resultLines.push(`<li style='margin-bottom: 0.25rem;'>${subContent}`);
+                    }
+                    continue;
+                }
+
+                closeToLevel(0);
+                resultLines.push(`<p style='margin-bottom: 0.5rem;'>${trimmed}</p>`);
+            }
+            closeToLevel(0);
+            return resultLines.join("");
+        }
+
+        // Vérification de santé au chargement
+        async function checkHealth() {
+            try {
+                const resp = await fetch(`${API_BASE}/health`);
+                if (resp.ok) {
+                    const data = await resp.json();
+                    statusText.textContent = `Connecté • ${data.total_documents.toLocaleString("fr-FR")} événements`;
+                    statusDot.style.backgroundColor = "var(--success)";
+                    if (data.llm_model) {
+                        modelInfo.textContent = `🤖 Modèle : ${data.llm_model}`;
+                    }
+                } else {
+                    statusText.textContent = "API non prête";
+                    statusDot.style.backgroundColor = "var(--warning)";
+                }
+            } catch (err) {
+                statusText.textContent = "API Déconnectée";
+                statusDot.style.backgroundColor = "var(--danger)";
+            }
+        }
+
+        // Notification Toast
+        function showToast(message, duration = 3000) {
+            toast.textContent = message;
+            toast.classList.add("show");
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, duration);
+        }
+
+        // Gestion des suggestions
+        function applySuggestion(question) {
+            questionInput.value = question;
+            handleFormSubmit(new Event("submit"));
+        }
+
+        // Soumission du formulaire
+        async function handleFormSubmit(e) {
+            if (e) e.preventDefault();
+            const question = questionInput.value.trim();
+            if (!question || isGenerating) return;
+
+            // Masquer la carte de bienvenue
+            if (welcomeCard) {
+                welcomeCard.style.display = "none";
+            }
+
+            // 1. Ajouter le message utilisateur
+            appendUserMessage(question);
+            questionInput.value = "";
+            setGeneratingState(true);
+
+            // 2. Ajouter l'indicateur de saisie
+            const typingId = appendTypingIndicator();
+            scrollToBottom();
+
+            const topK = parseInt(topKSelect.value, 10) || 4;
+
+            try {
+                const t0 = performance.now();
+                const resp = await fetch(`${API_BASE}/ask`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ question: question, top_k: topK })
+                });
+
+                removeTypingIndicator(typingId);
+
+                if (!resp.ok) {
+                    const errData = await resp.json().catch(() => ({}));
+                    const detail = errData.detail || `Erreur serveur (${resp.status})`;
+                    appendErrorMessage(`⚠️ ${detail}`);
+                    return;
+                }
+
+                const data = await resp.json();
+                appendBotMessage(data);
+
+            } catch (err) {
+                removeTypingIndicator(typingId);
+                appendErrorMessage(`⚠️ Impossible de joindre l'API : ${err.message}`);
+            } finally {
+                setGeneratingState(false);
+                scrollToBottom();
+                questionInput.focus();
+            }
+        }
+
+        function appendUserMessage(text) {
+            const row = document.createElement("div");
+            row.className = "message-row user";
+            row.innerHTML = `
+                <div class="message-content">
+                    <div class="bubble">${escapeHtml(text)}</div>
+                    <div class="message-meta" style="justify-content: flex-end;">
+                        <span>${new Date().toLocaleTimeString("fr-FR", { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                </div>
+                <div class="avatar user">👤</div>
+            `;
+            chatContainer.appendChild(row);
+        }
+
+        function appendBotMessage(data) {
+            const row = document.createElement("div");
+            row.className = "message-row bot";
+
+            const formattedHtml = formatMarkdown(data.answer);
+            const latencyStr = data.latency_seconds ? `${data.latency_seconds.toFixed(2)} s` : "";
+            const sources = data.sources || [];
+            const sourcesId = `sources-${Date.now()}`;
+
+            let sourcesHtml = "";
+            if (sources.length > 0) {
+                const sourceCards = sources.map((s, idx) => `
+                    <div class="source-card">
+                        <div class="source-card-header">
+                            <span class="source-title">${idx + 1}. ${escapeHtml(s.titre)}</span>
+                            <div class="source-badges">
+                                <span class="badge-city">📍 ${escapeHtml(s.ville)}</span>
+                                <span class="badge-score">Score: ${s.score_distance.toFixed(3)}</span>
+                            </div>
+                        </div>
+                        <div class="source-desc">${escapeHtml(s.description_preview || "")}</div>
+                        ${s.url ? `<a href="${escapeHtml(s.url)}" target="_blank" rel="noopener noreferrer" class="source-link">Consulter sur OpenAgenda ↗</a>` : ""}
+                    </div>
+                `).join("");
+
+                sourcesHtml = `
+                    <div class="sources-accordion">
+                        <div class="sources-header" onclick="toggleSources('${sourcesId}')">
+                            <span>📚 ${sources.length} sources FAISS consultées</span>
+                            <span id="arrow-${sourcesId}">▼</span>
+                        </div>
+                        <div class="sources-list" id="${sourcesId}">
+                            ${sourceCards}
+                        </div>
+                    </div>
+                `;
+            }
+
+            row.innerHTML = `
+                <div class="avatar bot">🤖</div>
+                <div class="message-content">
+                    <div class="bubble">${formattedHtml}</div>
+                    ${sourcesHtml}
+                    <div class="message-meta">
+                        ${latencyStr ? `<span class="latency-pill">⚡ ${latencyStr}</span>` : ""}
+                        <span>${new Date().toLocaleTimeString("fr-FR", { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                </div>
+            `;
+            chatContainer.appendChild(row);
+        }
+
+        function appendErrorMessage(errorText) {
+            const row = document.createElement("div");
+            row.className = "message-row bot";
+            row.innerHTML = `
+                <div class="avatar bot" style="background: var(--danger);">⚠️</div>
+                <div class="message-content">
+                    <div class="bubble" style="border-color: #fecaca; background: #fff5f5; color: #991b1b;">
+                        ${escapeHtml(errorText)}
+                    </div>
+                </div>
+            `;
+            chatContainer.appendChild(row);
+        }
+
+        function appendTypingIndicator() {
+            const id = `typing-${Date.now()}`;
+            const row = document.createElement("div");
+            row.className = "message-row bot";
+            row.id = id;
+            row.innerHTML = `
+                <div class="avatar bot">🤖</div>
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            chatContainer.appendChild(row);
+            return id;
+        }
+
+        function removeTypingIndicator(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        function toggleSources(id) {
+            const list = document.getElementById(id);
+            const arrow = document.getElementById(`arrow-${id}`);
+            if (list) {
+                list.classList.toggle("open");
+                if (arrow) {
+                    arrow.textContent = list.classList.contains("open") ? "▲" : "▼";
+                }
+            }
+        }
+
+        function setGeneratingState(generating) {
+            isGenerating = generating;
+            sendBtn.disabled = generating;
+            questionInput.disabled = generating;
+        }
+
+        function scrollToBottom() {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function clearChat() {
+            chatContainer.innerHTML = "";
+            if (welcomeCard) {
+                chatContainer.appendChild(welcomeCard);
+                welcomeCard.style.display = "block";
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement("div");
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Modal Rebuild & Confirmation
+        openSettingsBtn.addEventListener("click", () => {
+            rebuildResult.className = "rebuild-result";
+            rebuildResult.style.display = "none";
+            settingsModal.classList.add("open");
+        });
+
+        function closeSettingsModal() {
+            settingsModal.classList.remove("open");
+        }
+
+        function openConfirmRebuildModal() {
+            confirmRebuildModal.classList.add("open");
+        }
+
+        function closeConfirmRebuildModal() {
+            confirmRebuildModal.classList.remove("open");
+        }
+
+        async function confirmAndExecuteRebuild() {
+            closeConfirmRebuildModal();
+            await triggerRebuild();
+        }
+
+        // Fermeture des modales au clic extérieur
+        settingsModal.addEventListener("click", (e) => {
+            if (e.target === settingsModal) closeSettingsModal();
+        });
+
+        confirmRebuildModal.addEventListener("click", (e) => {
+            if (e.target === confirmRebuildModal) closeConfirmRebuildModal();
+        });
+
+        // Fermeture avec la touche Échap
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                if (confirmRebuildModal.classList.contains("open")) {
+                    closeConfirmRebuildModal();
+                } else if (settingsModal.classList.contains("open")) {
+                    closeSettingsModal();
+                }
+            }
+        });
+
+        async function triggerRebuild() {
+            const indexType = document.getElementById("indexTypeSelect").value;
+            const adminKey = document.getElementById("adminKeyInput").value.trim();
+
+            rebuildSubmitBtn.disabled = true;
+            rebuildSubmitBtn.textContent = "Rechargement...";
+            rebuildResult.style.display = "none";
+
+            try {
+                const headers = { "Content-Type": "application/json" };
+                if (adminKey) {
+                    headers["X-Admin-Key"] = adminKey;
+                }
+
+                const resp = await fetch(`${API_BASE}/rebuild`, {
+                    method: "POST",
+                    headers: headers,
+                    body: JSON.stringify({ index_type: indexType })
+                });
+
+                const data = await resp.json();
+
+                if (resp.ok) {
+                    rebuildResult.className = "rebuild-result success";
+                    rebuildResult.textContent = `✅ ${data.message} (${data.total_documents.toLocaleString("fr-FR")} événements actifs)`;
+                    rebuildResult.style.display = "block";
+                    showToast("Base vectorielle rechargée avec succès !");
+                    checkHealth();
+                } else {
+                    rebuildResult.className = "rebuild-result error";
+                    rebuildResult.textContent = `❌ ${data.detail || "Échec du rechargement"}`;
+                    rebuildResult.style.display = "block";
+                }
+            } catch (err) {
+                rebuildResult.className = "rebuild-result error";
+                rebuildResult.textContent = `❌ Erreur réseau : ${err.message}`;
+                rebuildResult.style.display = "block";
+            } finally {
+                rebuildSubmitBtn.disabled = false;
+                rebuildSubmitBtn.textContent = "🔄 Recharger l'index";
+            }
+        }
+
+        // Initialisation
+        window.addEventListener("DOMContentLoaded", () => {
+            checkHealth();
+            questionInput.focus();
+        });
+    </script>
+</body>
+</html>
