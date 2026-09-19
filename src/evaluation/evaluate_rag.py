@@ -37,7 +37,7 @@ for _mod in [
 
 # Assurer la présence des chemins projet dans sys.path
 _current_dir = Path(__file__).resolve().parent
-_root_dir = _current_dir.parent if _current_dir.name == "src" else _current_dir
+_root_dir = _current_dir.parent.parent if _current_dir.name == "evaluation" else (_current_dir.parent if _current_dir.name == "src" else _current_dir)
 for _path_item in (str(_root_dir), str(_root_dir / "src"), str(_current_dir)):
     if _path_item not in sys.path:
         sys.path.insert(0, _path_item)
@@ -55,9 +55,12 @@ except ModuleNotFoundError:
     from chatbot import EventRAGChatbot, get_project_root
 
 try:
-    from src.scenarios import SCENARIOS
+    from src.evaluation.scenarios import SCENARIOS
 except ModuleNotFoundError:
-    from scenarios import SCENARIOS
+    try:
+        from src.scenarios import SCENARIOS
+    except ModuleNotFoundError:
+        from scenarios import SCENARIOS
 
 logger = logging.getLogger("ragas_eval")
 

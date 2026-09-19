@@ -843,11 +843,12 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label for="indexTypeSelect">Type d'index FAISS :</label>
-                    <select id="indexTypeSelect">
-                        <option value="hnsw" selected>HNSW Flat (Rapide ~0.5ms - Recommandé)</option>
-                        <option value="flat">Flat L2 (Recherche exacte ~16ms)</option>
-                    </select>
+                    <label>Modèle d'index FAISS :</label>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 0.85rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-weight: 500; font-size: 0.85rem; color: #1e293b;">
+                        <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span>
+                        <span>HNSW Flat (Recherche ultra-rapide ~0.5ms &mdash; Modèle exclusif)</span>
+                    </div>
+                    <input type="hidden" id="indexTypeSelect" value="hnsw">
                 </div>
                 <div class="form-group">
                     <label for="adminKeyInput">Clé d'administration (X-Admin-Key) :</label>
@@ -859,7 +860,7 @@
             <div class="modal-footer">
                 <button class="btn-secondary" onclick="closeSettingsModal()">Fermer</button>
                 <button class="btn-primary" id="rebuildSubmitBtn" onclick="openConfirmRebuildModal()">
-                    🔄 Recharger l'index
+                    🔄 Recharger l'index HNSW
                 </button>
             </div>
         </div>
@@ -867,24 +868,33 @@
 
     <!-- Modal Popup de Confirmation Rebuild -->
     <div class="modal-backdrop" id="confirmRebuildModal" style="z-index: 120;">
-        <div class="modal-card" style="max-width: 440px;">
+        <div class="modal-card" style="max-width: 480px;">
             <div class="modal-header" style="background: #fffbeb; border-bottom: 1px solid #fef3c7;">
                 <h3 style="color: #92400e; display: flex; align-items: center; gap: 0.5rem; font-size: 1rem;">
-                    <span>⚠️</span> Confirmation requise
+                    <span>⚠️</span> Confirmation de reconstruction HNSW
                 </h3>
                 <button class="modal-close" onclick="closeConfirmRebuildModal()">&times;</button>
             </div>
             <div class="modal-body" style="padding: 1.25rem; font-size: 0.88rem; line-height: 1.5; color: #334155;">
-                <p style="font-weight: 600; color: #1e293b; margin-bottom: 0.5rem;">
-                    Êtes-vous sûr de vouloir recharger ou reconstruire la base vectorielle FAISS ?
+                <p style="font-weight: 600; color: #1e293b; margin-bottom: 0.4rem;">
+                    Êtes-vous sûr de vouloir recharger l'index vectoriel HNSW ?
                 </p>
-                <p style="color: #64748b; font-size: 0.82rem; margin: 0;">
-                    Cette action va réinitialiser l'index vectoriel en mémoire du serveur et recharger les documents. Ce processus peut prendre quelques instants.
+                <p style="color: #64748b; font-size: 0.82rem; margin: 0 0 1rem 0;">
+                    Cette action réinitialise et recharge l'index vectoriel HNSW en mémoire du serveur avec l'ensemble des événements.
                 </p>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.85rem; margin-bottom: 0.5rem;">
+                    <label for="confirmPhraseInput" style="display: block; font-weight: 600; font-size: 0.8rem; color: #475569; margin-bottom: 0.4rem;">
+                        Pour valider, veuillez saisir la phrase exacte ci-dessous :
+                    </label>
+                    <div style="background: #ffffff; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 0.5rem 0.75rem; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 0.82rem; color: #0f172a; margin-bottom: 0.6rem; user-select: all; word-break: break-word;">
+                        Je valide la reconstruction de la base vectorielle
+                    </div>
+                    <input type="text" id="confirmPhraseInput" placeholder="Saisissez la phrase exacte pour déverrouiller..." style="width: 100%; box-sizing: border-box; padding: 0.6rem 0.75rem; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 0.84rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s;" autocomplete="off" spellcheck="false">
+                </div>
             </div>
             <div class="modal-footer" style="background: #fafafa; padding: 0.75rem 1.25rem;">
                 <button class="btn-secondary" onclick="closeConfirmRebuildModal()">Annuler</button>
-                <button class="btn-primary" id="confirmRebuildExecBtn" style="background: #d97706;" onclick="confirmAndExecuteRebuild()">
+                <button class="btn-primary" id="confirmRebuildExecBtn" style="background: #d97706; opacity: 0.5; cursor: not-allowed;" onclick="confirmAndExecuteRebuild()" disabled>
                     Confirmer et lancer
                 </button>
             </div>
@@ -914,6 +924,9 @@
         const openSettingsBtn = document.getElementById("openSettingsBtn");
         const rebuildResult = document.getElementById("rebuildResult");
         const rebuildSubmitBtn = document.getElementById("rebuildSubmitBtn");
+        const confirmPhraseInput = document.getElementById("confirmPhraseInput");
+        const confirmRebuildExecBtn = document.getElementById("confirmRebuildExecBtn");
+        const REQUIRED_CONFIRMATION_PHRASE = "Je valide la reconstruction de la base vectorielle";
         const toast = document.getElementById("toast");
 
         // Formatage Markdown léger vers HTML sécurisé
@@ -1245,17 +1258,51 @@
             settingsModal.classList.remove("open");
         }
 
+        function updateConfirmRebuildBtn() {
+            const entered = (confirmPhraseInput.value || "").trim();
+            const isValid = entered === REQUIRED_CONFIRMATION_PHRASE;
+            confirmRebuildExecBtn.disabled = !isValid;
+            if (isValid) {
+                confirmRebuildExecBtn.style.opacity = "1";
+                confirmRebuildExecBtn.style.cursor = "pointer";
+                confirmPhraseInput.style.borderColor = "#10b981";
+                confirmPhraseInput.style.boxShadow = "0 0 0 3px rgba(16, 185, 129, 0.15)";
+            } else {
+                confirmRebuildExecBtn.style.opacity = "0.5";
+                confirmRebuildExecBtn.style.cursor = "not-allowed";
+                confirmPhraseInput.style.borderColor = "#cbd5e1";
+                confirmPhraseInput.style.boxShadow = "none";
+            }
+        }
+
         function openConfirmRebuildModal() {
+            confirmPhraseInput.value = "";
+            updateConfirmRebuildBtn();
             confirmRebuildModal.classList.add("open");
+            setTimeout(() => confirmPhraseInput.focus(), 60);
         }
 
         function closeConfirmRebuildModal() {
             confirmRebuildModal.classList.remove("open");
+            confirmPhraseInput.value = "";
+            updateConfirmRebuildBtn();
         }
 
+        confirmPhraseInput.addEventListener("input", updateConfirmRebuildBtn);
+        confirmPhraseInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !confirmRebuildExecBtn.disabled) {
+                e.preventDefault();
+                confirmAndExecuteRebuild();
+            }
+        });
+
         async function confirmAndExecuteRebuild() {
+            const entered = (confirmPhraseInput.value || "").trim();
+            if (entered !== REQUIRED_CONFIRMATION_PHRASE) {
+                return;
+            }
             closeConfirmRebuildModal();
-            await triggerRebuild();
+            await triggerRebuild(entered);
         }
 
         // Fermeture des modales au clic extérieur
@@ -1278,8 +1325,8 @@
             }
         });
 
-        async function triggerRebuild() {
-            const indexType = document.getElementById("indexTypeSelect").value;
+        async function triggerRebuild(confirmedPhrase) {
+            const indexType = document.getElementById("indexTypeSelect").value || "hnsw";
             const adminKey = document.getElementById("adminKeyInput").value.trim();
 
             rebuildSubmitBtn.disabled = true;
@@ -1295,7 +1342,10 @@
                 const resp = await fetch(`${API_BASE}/rebuild`, {
                     method: "POST",
                     headers: headers,
-                    body: JSON.stringify({ index_type: indexType })
+                    body: JSON.stringify({
+                        index_type: indexType,
+                        confirmation: confirmedPhrase || REQUIRED_CONFIRMATION_PHRASE
+                    })
                 });
 
                 const data = await resp.json();
@@ -1304,7 +1354,7 @@
                     rebuildResult.className = "rebuild-result success";
                     rebuildResult.textContent = `✅ ${data.message} (${data.total_documents.toLocaleString("fr-FR")} événements actifs)`;
                     rebuildResult.style.display = "block";
-                    showToast("Base vectorielle rechargée avec succès !");
+                    showToast("Base vectorielle HNSW rechargée avec succès !");
                     checkHealth();
                 } else {
                     rebuildResult.className = "rebuild-result error";
@@ -1317,7 +1367,7 @@
                 rebuildResult.style.display = "block";
             } finally {
                 rebuildSubmitBtn.disabled = false;
-                rebuildSubmitBtn.textContent = "🔄 Recharger l'index";
+                rebuildSubmitBtn.textContent = "🔄 Recharger l'index HNSW";
             }
         }
 

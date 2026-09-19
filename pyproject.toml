@@ -21,3 +21,8 @@ dependencies = [
     "ragas>=0.4.3",
     "uvicorn>=0.30.0",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest-html>=4.2.0",
+]

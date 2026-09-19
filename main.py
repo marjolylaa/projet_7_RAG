@@ -32,7 +32,13 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-from src.evaluer_scenarios import run_evaluation
+try:
+    from src.evaluation.evaluer_scenarios import run_evaluation
+except ModuleNotFoundError:
+    try:
+        from src.evaluer_scenarios import run_evaluation
+    except ModuleNotFoundError:
+        run_evaluation = None
 from src.inspect_index import get_project_root, inspect_index
 
 
@@ -55,16 +61,16 @@ def status_check() -> None:
     print("   • Moteur RAG métier    : `src/chatbot.py` (classe `EventRAGChatbot`)")
     print("     -> Prêt à être connecté à l'API REST ou une interface graphique (Streamlit, etc.)")
     print("   • API REST FastAPI     : `src/api.py` (endpoints /ask, /rebuild, Swagger /docs)")
-    print("   • Interface Web        : `src/static/index.html` (accessible à la racine http://127.0.0.1:8000)")
+    print("   • Interface Web        : `src/static/ui-chatbot.html` (accessible à la racine http://127.0.0.1:8000)")
     print("   • Interface Console    : `src/cli.py` (mode terminal isolé)")
-    print("   • Suite d'évaluation   : `src/evaluer_scenarios.py` (5 scénarios avec rapport HTML et Ragas)")
-    print("   • Évaluation Ragas     : `src/evaluate_rag.py` (Faithfulness, Answer Correctness)")
+    print("   • Suite d'évaluation   : `src/evaluation/evaluer_scenarios.py` (5 scénarios avec rapport HTML et Ragas)")
+    print("   • Évaluation Ragas     : `src/evaluation/evaluate_rag.py` (Faithfulness, Answer Correctness)")
     print("   • Outil d'audit local  : `src/inspect_index.py` (100% hors-ligne, 0 crédit)")
     print("-" * 75)
     print("🚀 COMMANDES UTILES :")
     print("   • Lancer l'Interface UI: uv run python main.py --ui")
     print("   • Lancer l'API REST    : uv run python main.py --serve (ou uv run uvicorn src.api:app --reload)")
-    print("   • Tester l'API         : uv run python api_test.py")
+    print("   • Tester l'API         : uv run python tests/test_api.py")
     print("   • Inspecter la base    : uv run python main.py --inspect [--keyword <mot>]")
     print("   • Évaluer les scénarios: uv run python main.py --eval")
     print("   • Évaluation Ragas     : uv run python main.py --ragas")
@@ -196,7 +202,10 @@ def main() -> None:
         return
 
     if args.ragas:
-        from src.evaluate_rag import main as run_ragas_main
+        try:
+            from src.evaluation.evaluate_rag import main as run_ragas_main
+        except ModuleNotFoundError:
+            from src.evaluate_rag import main as run_ragas_main
         run_ragas_main()
         return
 

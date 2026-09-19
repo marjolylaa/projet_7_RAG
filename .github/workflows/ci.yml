@@ -1,0 +1,62 @@
+name: CI - Tests Unitaires & Rapport
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Exécution des Tests & Rapport
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Récupération du code source
+        uses: actions/checkout@v4
+
+      - name: ⚡ Installation de uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: 🐍 Configuration de l'environnement Python
+        run: uv python install 3.13
+
+      - name: 📦 Installation des dépendances
+        run: uv sync --dev
+
+      - name: 🧪 Exécution des tests unitaires et génération du rapport
+        env:
+          MISTRAL_API_KEY: "mock-mistral-api-key-ci"
+        run: |
+          mkdir -p tests/rapport
+          uv run pytest \
+            --html=tests/rapport/rapport_tests_unitaires.html \
+            --self-contained-html \
+            --junitxml=tests/rapport/junit.xml \
+            -v
+
+      - name: 📊 Publication du résumé dans le Job Summary
+        if: always()
+        run: |
+          echo "## 🧪 Résumé de l'exécution des tests" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Statut** : ✅ Tests exécutés" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environnement** : Python 3.13 + uv" >> $GITHUB_STEP_SUMMARY
+          echo "- **Rapport** : Généré dans \`tests/rapport/\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Appels API externes** : 0 (100% hors-ligne, mocks déterministes)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Le rapport interactif complet HTML est téléchargeable dans les artefacts de ce workflow." >> $GITHUB_STEP_SUMMARY
+
+      - name: 📤 Sauvegarde du rapport de test en artefact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport-tests-unitaires-html
+          path: |
+            tests/rapport/rapport_tests_unitaires.html
+            tests/rapport/junit.xml
+          retention-days: 30

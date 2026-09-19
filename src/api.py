@@ -44,7 +44,8 @@ except ModuleNotFoundError:
     from chatbot import EventRAGChatbot, get_project_root
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
-INDEX_HTML_PATH = STATIC_DIR / "index.html"
+UI_HTML_PATH = STATIC_DIR / "ui-chatbot.html"
+INDEX_HTML_PATH = UI_HTML_PATH  # Alias de rétrocompatibilité
 
 
 # ============================================================================
@@ -87,12 +88,20 @@ class AnswerResponse(BaseModel):
     timestamp: str = Field(..., description="Horodatage ISO de la requête.")
 
 
+REQUIRED_REBUILD_CONFIRMATION = "Je valide la reconstruction de la base vectorielle"
+
+
 class RebuildRequest(BaseModel):
     """Paramètres pour la reconstruction ou le rechargement de la base vectorielle."""
     index_type: Optional[str] = Field(
-        default=None,
-        description="Type ou chemin d'index à charger ('hnsw', 'flat' ou None pour recharger l'index actuel).",
+        default="hnsw",
+        description="Type ou modèle d'index à recharger (exclusivement 'hnsw').",
         examples=["hnsw"],
+    )
+    confirmation: Optional[str] = Field(
+        default=None,
+        description="Phrase de confirmation requise pour valider la reconstruction : 'Je valide la reconstruction de la base vectorielle'.",
+        examples=[REQUIRED_REBUILD_CONFIRMATION],
     )
 
 
@@ -137,10 +146,20 @@ async def lifespan(app: FastAPI):
             print(f"⚠️ Avertissement lors de l'initialisation du chatbot : {exc}")
             app.state.bot = None
 
+    host = os.getenv("HOST", "0.0.0.0")
+    port = os.getenv("PORT", "8000")
+    display_host = "localhost" if host in ("0.0.0.0", "127.0.0.1") else host
+    base_url = f"http://{display_host}:{port}"
+    print("=" * 72, flush=True)
+    print(f"🌐 Application RAG en ligne : {base_url}", flush=True)
+    print(f"🎭 Interface Web             : {base_url}/ (ou {base_url}/ui)", flush=True)
+    print(f"📖 Documentation API Swagger : {base_url}/docs", flush=True)
+    print("=" * 72, flush=True)
+
     yield
 
     # Nettoyage à l'arrêt si nécessaire
-    print("🛑 Arrêt de l'API RAG.")
+    print("🛑 Arrêt de l'API RAG.", flush=True)
 
 
 # Initialisation de l'application FastAPI
@@ -237,12 +256,12 @@ async def root(
             }
         )
 
-    if not INDEX_HTML_PATH.exists():
+    if not UI_HTML_PATH.exists():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Fichier d'interface statique introuvable (src/static/index.html).",
+            detail="Fichier d'interface statique introuvable (src/static/ui-chatbot.html).",
         )
-    return FileResponse(INDEX_HTML_PATH, media_type="text/html")
+    return FileResponse(UI_HTML_PATH, media_type="text/html")
 
 
 @app.get(
@@ -253,12 +272,12 @@ async def root(
 )
 async def serve_ui() -> FileResponse:
     """Sert l'interface graphique légère pour dialoguer avec l'assistant RAG et administrer la base."""
-    if not INDEX_HTML_PATH.exists():
+    if not UI_HTML_PATH.exists():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Fichier d'interface statique introuvable (src/static/index.html).",
+            detail="Fichier d'interface statique introuvable (src/static/ui-chatbot.html).",
         )
-    return FileResponse(INDEX_HTML_PATH, media_type="text/html")
+    return FileResponse(UI_HTML_PATH, media_type="text/html")
 
 
 @app.get(
@@ -345,7 +364,8 @@ async def ask_question(
     summary="Reconstruire ou recharger la base vectorielle (POST)",
     tags=["Administration"],
     responses={
-        200: {"description": "Base vectorielle rechargée avec succès."},
+        200: {"description": "Base vectorielle HNSW rechargée avec succès."},
+        400: {"description": "Paramètres invalides (seul 'hnsw' est autorisé ou phrase de confirmation incorrecte)."},
         403: {"description": "Accès refusé : clé d'administration invalide."},
         500: {"description": "Erreur lors du rechargement de la base vectorielle."},
     },
@@ -355,14 +375,28 @@ async def rebuild_post(
     bot: EventRAGChatbot = Depends(get_bot),
     _authorized: bool = Depends(verify_admin_access),
 ) -> RebuildResponse:
-    """Recharge ou bascule la base vectorielle FAISS en mémoire à la demande."""
-    index_type = payload.index_type if payload else None
+    """Recharge l'index vectoriel HNSW en mémoire à la demande après validation par phrase de confirmation."""
+    # 1. Validation de la phrase de confirmation obligatoire
+    if not payload or payload.confirmation != REQUIRED_REBUILD_CONFIRMATION:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Confirmation requise : vous devez entrer la phrase exacte : '{REQUIRED_REBUILD_CONFIRMATION}'",
+        )
+
+    # 2. Validation stricte du modèle d'index (exclusivement HNSW)
+    raw_index_type = (payload.index_type or "hnsw").strip().lower()
+    if raw_index_type not in ("hnsw", "fast", "rapide"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Seul le modèle d'index 'hnsw' est autorisé pour la reconstruction.",
+        )
+
     try:
-        ntotal = bot.reload_index(index_dir=index_type)
+        ntotal = bot.reload_index(index_dir="hnsw")
         stats = bot.get_stats()
         return RebuildResponse(
             status="success",
-            message="La base vectorielle a été rechargée avec succès.",
+            message="La base vectorielle HNSW a été rechargée avec succès.",
             total_documents=ntotal,
             index_path=stats["index_path"],
             timestamp=datetime.now().isoformat(),
@@ -379,19 +413,39 @@ async def rebuild_post(
     response_model=RebuildResponse,
     summary="Reconstruire ou recharger la base vectorielle (GET)",
     tags=["Administration"],
+    responses={
+        200: {"description": "Base vectorielle HNSW rechargée avec succès."},
+        400: {"description": "Paramètres invalides (seul 'hnsw' est autorisé ou phrase de confirmation incorrecte)."},
+        403: {"description": "Accès refusé : clé d'administration invalide."},
+        500: {"description": "Erreur lors du rechargement de la base vectorielle."},
+    },
 )
 async def rebuild_get(
-    index_type: Optional[str] = Query(None, description="Type d'index ('hnsw', 'flat')"),
+    index_type: Optional[str] = Query("hnsw", description="Modèle d'index (exclusivement 'hnsw')"),
+    confirmation: Optional[str] = Query(None, description="Phrase exacte requise pour valider la reconstruction"),
     bot: EventRAGChatbot = Depends(get_bot),
     _authorized: bool = Depends(verify_admin_access),
 ) -> RebuildResponse:
-    """Version HTTP GET pour recharger ou basculer l'index vectoriel directement depuis un navigateur."""
+    """Version HTTP GET pour recharger l'index vectoriel HNSW avec phrase de confirmation."""
+    if confirmation != REQUIRED_REBUILD_CONFIRMATION:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Confirmation requise : vous devez entrer la phrase exacte : '{REQUIRED_REBUILD_CONFIRMATION}'",
+        )
+
+    raw_index_type = (index_type or "hnsw").strip().lower()
+    if raw_index_type not in ("hnsw", "fast", "rapide"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Seul le modèle d'index 'hnsw' est autorisé pour la reconstruction.",
+        )
+
     try:
-        ntotal = bot.reload_index(index_dir=index_type)
+        ntotal = bot.reload_index(index_dir="hnsw")
         stats = bot.get_stats()
         return RebuildResponse(
             status="success",
-            message="La base vectorielle a été rechargée avec succès.",
+            message="La base vectorielle HNSW a été rechargée avec succès.",
             total_documents=ntotal,
             index_path=stats["index_path"],
             timestamp=datetime.now().isoformat(),

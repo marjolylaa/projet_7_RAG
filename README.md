@@ -18,7 +18,7 @@ uv sync
 
 ### 2. Configuration
 
-Ajouter un fichier `.env` dans le dossier `src/` (ou à la racine) avec votre clé d'API Mistral :
+Ajouter un fichier `.env` dans le dossier `src/` avec votre clé d'API Mistral :
 
 ```env
 MISTRAL_API_KEY=votre_cle_api
@@ -40,12 +40,25 @@ bot = EventRAGChatbot()
 reponse = bot.chat("Quels concerts de jazz sont prévus cet été ?")
 ```
 
-### 1. Vérifier l'état du projet
+### 1. Création de la base vectorielle HNSW (Première étape)
+Avant de lancer le chatbot ou l'API, initialisez la base vectorielle FAISS HNSW en interrogeant l'API publique OpenAgenda (OpenDataSoft) :
+```bash
+# Création complète de la base vectorielle HNSW
+uv run python src/creer_index_hnsw.py
+
+# Ou création d'un index réduit pour tester (ex: 50 événements)
+uv run python src/creer_index_hnsw.py --limit 50
+
+# Mode simulation (teste la récupération sans appeler l'API d'embeddings)
+uv run python src/creer_index_hnsw.py --dry --limit 10
+```
+
+### 2. Vérifier l'état du projet
 ```bash
 uv run python main.py
 ```
 
-### 2. Inspecter la base vectorielle (100% hors-ligne - 0 crédit)
+### 3. Inspecter la base vectorielle (100% hors-ligne - 0 crédit)
 Pour auditer les données locales (nombre de vecteurs, villes, mots-clés) sans appel API :
 ```bash
 uv run python main.py --inspect
@@ -53,7 +66,7 @@ uv run python main.py --inspect
 uv run python main.py --inspect --keyword jazz
 ```
 
-### 3. Lancer l'Interface Graphique Web (Très légère)
+### 4. Lancer l'Interface Graphique Web (Très légère)
 Pour interagir visuellement avec le chatbot et tester les recommandations en direct dans le navigateur :
 ```bash
 uv run python main.py --ui
@@ -64,7 +77,7 @@ Cette commande démarre le serveur et ouvre automatiquement votre navigateur sur
 - ⏱️ **Indicateurs de performance** : mesure de la latence en secondes et statut en direct de l'API.
 - ⚙️ **Administration intégrée** : bouton *Rebuild* protégé par confirmation pour recharger ou basculer l'index à chaud.
 
-### 4. Lancer l'API REST FastAPI
+### 5. Lancer l'API REST FastAPI
 Pour lancer uniquement le serveur d'API (sans ouvrir automatiquement le navigateur) :
 ```bash
 uv run python main.py --serve
@@ -76,32 +89,76 @@ uv run python main.py --serve
 - **Santé & Métadonnées** : `GET http://127.0.0.1:8000/health`
 - **Poser une question** : `POST http://127.0.0.1:8000/ask` (body : `{"question": "...", "top_k": 4}`)
 - **Recharger / Reconstruire l'index** : `POST http://127.0.0.1:8000/rebuild` ou `GET http://127.0.0.1:8000/rebuild`
-  *(Protégé par pop-up de confirmation dans l'UI et header `X-Admin-Key` si `ADMIN_API_KEY` est configuré)*
+  *(Protégé par saisie de phrase de confirmation dans l'UI et header `X-Admin-Key` si `ADMIN_API_KEY` est configuré)*
 
-### 5. Exécuter les tests fonctionnels de l'API
-Pour valider l'ensemble des endpoints HTTP, l'interface graphique à la racine `/` et `/ui`, les codes d'erreurs (400, 422, 403), et Swagger :
+### 6. Déploiement avec Docker & Docker Compose
+
+Le chatbot est entièrement conteneurisé. Au démarrage du conteneur, l'application affiche immédiatement dans les logs Docker les URL directes d'accès à l'application.
+
+#### Méthode A : Avec Docker Compose (Recommandé)
+Le fichier `docker-compose.yml` configure automatiquement le port, la politique de redémarrage, le healthcheck et charge votre clé depuis `src/.env` :
+
 ```bash
-uv run python api_test.py
+# Construire et lancer le conteneur en arrière-plan
+docker compose up --build -d
+
+# Consulter les logs de démarrage (affiche l'URL d'accès)
+docker compose logs -f
+
+# Arrêter le conteneur
+docker compose down
 ```
 
-### 6. Évaluer les scénarios d'interaction RAG (Vérité terrain & Rapport HTML)
+#### Méthode B : Avec Docker CLI classique
+```bash
+# 1. Construction de l'image Docker
+docker build -t rag-evenements-chatbot .
+
+# 2. Lancement du conteneur en passant la clé d'API Mistral
+docker run -d \
+  --name rag-chatbot \
+  -p 8000:8000 \
+  -e MISTRAL_API_KEY="votre_cle_api_mistral" \
+  rag-evenements-chatbot
+
+# 3. Affichage des logs et des URL d'accès
+docker logs -f rag-chatbot
+```
+
+#### Accès aux services conteneurisés :
+- 🌐 **Interface Web (Chatbot RAG)** : [http://localhost:8000](http://localhost:8000) (ou `http://127.0.0.1:8000/ui`)
+- 📖 **Documentation Swagger OpenAPI** : [http://localhost:8000/docs](http://localhost:8000/docs)
+- 🩺 **Contrôle de santé (Healthcheck)** : [http://localhost:8000/health](http://localhost:8000/health)
+
+---
+
+### 7. Exécuter les tests fonctionnels de l'API
+Pour valider l'ensemble des endpoints HTTP, l'interface graphique à la racine `/` et `/ui`, les codes d'erreurs (400, 422, 403), et Swagger :
+```bash
+uv run python tests/test_api.py
+```
+
+### 8. Évaluer les scénarios d'interaction RAG (Vérité terrain & Rapport HTML)
 Pour exécuter la suite de 5 scénarios de test et les comparer aux **réponses de référence annotées par l'humain** :
 ```bash
-uv run python src/evaluer_scenarios.py
+uv run python src/evaluation/evaluer_scenarios.py
 # ou : uv run python main.py --eval
 # génère par défaut : rapport/rapport_evaluation.html
 ```
 
-### 7. Mode console de test (CLI isolé)
+### 9. Mode console de test (CLI isolé)
 Pour échanger avec le bot directement dans le terminal (outil de test) :
 ```bash
 uv run python src/cli.py
 # ou : uv run python main.py --cli
 ```
 
-### 8. Exécuter l'ensemble des tests automatisés
+### 10. Exécuter l'ensemble des tests automatisés
 ```bash
 uv run pytest
+
+# Ou avec génération du rapport interactif HTML dans tests/rapport/ :
+uv run pytest --html=tests/rapport/rapport_tests_unitaires.html --self-contained-html
 ```
 
 ---
@@ -118,26 +175,33 @@ Sur un corpus de ~24 700 événements indexés :
 
 ```text
 projet_7_systeme_RAG/
+├── Dockerfile                                      # Image Docker multi-plateforme optimisée
+├── docker-compose.yml                              # Orchestration Docker Compose
 ├── rapport/                                        # Rapports d'évaluation HTML générés
 │   └── rapport_evaluation.html
 ├── resources/                                      # Données brutes CSV
 ├── src/
-│   ├── api.py                                      # API REST FastAPI (/ask, /rebuild, /docs)
+│   ├── api.py                                      # API REST FastAPI (/ask, /rebuild, /docs, /)
 │   ├── chatbot.py                                  # Moteur RAG métier (classe EventRAGChatbot)
 │   ├── cli.py                                      # Interface console de test isolée
-│   ├── evaluer_scenarios.py                       # Démonstration sur 5 scénarios & rapport HTML
+│   ├── creer_index_hnsw.py                         # Création autonome de l'index FAISS HNSW via l'API
 │   ├── inspect_index.py                            # Inspection locale hors-ligne (0 crédit)
-│   ├── recuperation_data_et_vectorisation.ipynb   # Notebook de préparation et benchmarks
+│   ├── evaluation/                                 # Suite d'évaluation et de benchmark
+│   │   ├── __init__.py
+│   │   ├── scenarios.py                            # Définition des scénarios et vérités terrain
+│   │   ├── evaluate_rag.py                         # Évaluation standardisée Ragas (LLM-as-a-judge)
+│   │   ├── evaluer_scenarios.py                    # Démonstration sur 5 scénarios & rapport HTML
+│   │   └── rapport_template.html                   # Gabarit HTML Jinja2 du rapport d'évaluation
 │   ├── static/
-│   │   └── index.html                              # Interface Web graphique interactive
-│   ├── mon_index_langchain_evenements/             # Index FAISS Flat L2
-│   ├── mon_index_langchain_evenements_hnsw_rapide/ # Index FAISS HNSW optimisé
+│   │   └── ui-chatbot.html                         # Interface Web graphique interactive
+│   ├── mon_index_langchain_evenements_hnsw_rapide/ # Index FAISS HNSW optimisé (inclus dans l'image)
 │   └── .env                                        # Clé API Mistral (non versionné)
 ├── tests/
 │   ├── conftest.py
-│   ├── test_api.py                                 # Tests d'intégration API REST
-│   └── test_chatbot.py                             # Tests unitaires et RAG (100% offline)
-├── api_test.py                                     # Script de test fonctionnel autonome de l'API
+│   ├── test_api.py                                 # Tests fonctionnels et d'intégration de l'API REST
+│   ├── test_chatbot.py                             # Tests unitaires et RAG (100% offline)
+│   ├── test_creer_index_hnsw.py                    # Tests unitaires du script d'indexation (mode dry)
+│   └── rapport/                                    # Rapports de tests automatisés (HTML & XML)
 ├── main.py                                         # Point d'orchestration (CLI, Serveur, Audit)
 ├── pyproject.toml
 ├── uv.lock
