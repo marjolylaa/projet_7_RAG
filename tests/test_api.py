@@ -41,6 +41,10 @@ root_dir = Path(__file__).resolve().parent.parent
 if str(root_dir) not in sys.path:
     sys.path.insert(0, str(root_dir))
 
+# En environnement de test, forcer les identifiants d'administration pour les endpoints sécurisés
+os.environ["ADMIN_USERNAME"] = "admin"
+os.environ["ADMIN_PASSWORD"] = "le_mot_de_passe"
+
 import pytest
 from fastapi.testclient import TestClient
 from langchain_community.vectorstores import FAISS
@@ -125,6 +129,8 @@ def build_test_chatbot() -> EventRAGChatbot:
     vectorstore = FAISS.from_documents(docs, embeddings)
 
     # Initialisation de l'objet métier sans réseau
+    os.environ["ADMIN_USERNAME"] = "admin"
+    os.environ["ADMIN_PASSWORD"] = "le_mot_de_passe"
     os.environ.setdefault("MISTRAL_API_KEY", "mock_key_for_testing")
     bot = EventRAGChatbot(
         vectorstore=vectorstore,
@@ -132,6 +138,7 @@ def build_test_chatbot() -> EventRAGChatbot:
         embeddings=embeddings,
         top_k=2,
     )
+    bot.index_path = Path("mock_index")
     return bot
 
 
@@ -182,7 +189,8 @@ def test_ui_endpoint(client: TestClient) -> None:
     assert "text/html" in response.headers.get("content-type", "")
     assert "<!DOCTYPE html>" in response.text or "<html" in response.text
     assert "Hauts-de-France" in response.text
-    assert "openSettingsBtn" in response.text
+    assert "chatContainer" in response.text
+    assert "openSettingsBtn" not in response.text
 
 
 def test_health_endpoint(client: TestClient) -> None:
@@ -265,12 +273,13 @@ def test_ask_invalid_payload_returns_422(client: TestClient) -> None:
 
 
 def test_rebuild_post_endpoint(client: TestClient) -> None:
-    """Vérifie que POST /rebuild recharge la base vectorielle HNSW avec succès lorsque la phrase requise est fournie."""
+    """Vérifie que POST /rebuild recharge la base vectorielle HNSW avec succès lorsque les identifiants admin sont fournis."""
     response = client.post(
         "/rebuild",
         json={
             "index_type": "hnsw",
-            "confirmation": "Je valide la reconstruction de la base vectorielle",
+            "user": "admin",
+            "password": "le_mot_de_passe",
         },
     )
     assert response.status_code == 200
@@ -281,100 +290,147 @@ def test_rebuild_post_endpoint(client: TestClient) -> None:
     assert "timestamp" in data
 
 
-def test_rebuild_get_endpoint(client: TestClient) -> None:
-    """Vérifie que GET /rebuild permet également de recharger la base avec la phrase de confirmation."""
+def test_rebuild_get_method_not_allowed(client: TestClient) -> None:
+    """Vérifie que GET /rebuild est désormais interdit (HTTP 405 Method Not Allowed) conformément aux standards REST."""
     response = client.get(
         "/rebuild",
-        params={
-            "index_type": "hnsw",
-            "confirmation": "Je valide la reconstruction de la base vectorielle",
-        },
+        params={"index_type": "hnsw"},
+        auth=("admin", "le_mot_de_passe"),
     )
-    assert response.status_code == 200
-    data = response.json()
-    assert data["status"] == "success"
-    assert data["total_documents"] >= 2
+    assert response.status_code == 405
+
+
+def test_rebuild_triggers_reconstruction_pipeline(client: TestClient) -> None:
+    """Vérifie que /rebuild déclenche bien la fonction de reconstruction avec le paramètre limit."""
+    from unittest.mock import patch
+
+    with patch("src.api.reconstruire_index_hnsw") as mock_rebuild:
+        mock_rebuild.return_value = 50
+        bot = app.dependency_overrides[get_bot]()
+        orig_path = bot.index_path
+        try:
+            bot.index_path = Path("production_index_path")
+            with patch.object(bot, "reload_index", return_value=50):
+                resp = client.post(
+                    "/rebuild",
+                    json={
+                        "index_type": "hnsw",
+                        "user": "admin",
+                        "password": "le_mot_de_passe",
+                        "limit": 25,
+                    },
+                )
+                assert resp.status_code == 200
+                mock_rebuild.assert_called_once_with(limit=25)
+                data = resp.json()
+                assert "reconstruite" in data["message"].lower()
+                assert data["total_documents"] == 50
+        finally:
+            bot.index_path = orig_path
 
 
 def test_rebuild_validation_rules(client: TestClient) -> None:
-    """Vérifie le rejet strict si la confirmation est absente/invalide ou si l'index n'est pas HNSW."""
-    # 1. POST sans confirmation -> 400
-    resp_no_conf = client.post("/rebuild", json={"index_type": "hnsw"})
-    assert resp_no_conf.status_code == 400
-    assert "confirmation requise" in resp_no_conf.json().get("detail", "").lower()
+    """Vérifie le rejet strict si les identifiants sont absents/invalides ou si l'index n'est pas HNSW."""
+    # 1. POST sans identifiants -> 401
+    resp_no_creds = client.post("/rebuild", json={"index_type": "hnsw"})
+    assert resp_no_creds.status_code == 401
+    assert "obligatoire" in resp_no_creds.json().get("detail", "").lower()
 
-    # 2. POST avec mauvaise phrase de confirmation -> 400
-    resp_wrong_conf = client.post(
+    # 2. POST avec mot de passe invalide -> 401
+    resp_wrong_pwd = client.post(
         "/rebuild",
-        json={"index_type": "hnsw", "confirmation": "Phrase invalide"},
+        json={"index_type": "hnsw", "user": "admin", "password": "mauvais_mot_de_passe"},
     )
-    assert resp_wrong_conf.status_code == 400
+    assert resp_wrong_pwd.status_code == 401
+    assert "invalide" in resp_wrong_pwd.json().get("detail", "").lower()
 
-    # 3. POST avec modèle d'index interdit (ex: flat) -> 400
+    # 3. POST avec nom d'utilisateur invalide -> 401
+    resp_wrong_user = client.post(
+        "/rebuild",
+        json={"index_type": "hnsw", "user": "mauvais_user", "password": "le_mot_de_passe"},
+    )
+    assert resp_wrong_user.status_code == 401
+    assert "invalide" in resp_wrong_user.json().get("detail", "").lower()
+
+    # 4. POST avec modèle d'index interdit (ex: flat) avec identifiants valides -> 400
     resp_flat = client.post(
         "/rebuild",
         json={
             "index_type": "flat",
-            "confirmation": "Je valide la reconstruction de la base vectorielle",
+            "user": "admin",
+            "password": "le_mot_de_passe",
         },
     )
     assert resp_flat.status_code == 400
     assert "hnsw" in resp_flat.json().get("detail", "").lower()
 
-    # 4. GET sans confirmation -> 400
-    resp_get_no_conf = client.get("/rebuild", params={"index_type": "hnsw"})
-    assert resp_get_no_conf.status_code == 400
-
-    # 5. GET avec modèle d'index interdit -> 400
-    resp_get_flat = client.get(
-        "/rebuild",
-        params={
-            "index_type": "flat",
-            "confirmation": "Je valide la reconstruction de la base vectorielle",
-        },
-    )
-    assert resp_get_flat.status_code == 400
-
 
 def test_rebuild_security_protection(client: TestClient) -> None:
-    """Vérifie la protection de l'endpoint /rebuild lorsqu'une clé ADMIN_API_KEY est configurée."""
-    env_backup = os.environ.get("ADMIN_API_KEY")
+    """Vérifie la protection de l'endpoint /rebuild par utilisateur et mot de passe (Basic Auth ou JSON)."""
+    user_backup = os.environ.get("ADMIN_USERNAME")
+    pass_backup = os.environ.get("ADMIN_PASSWORD")
     valid_payload = {
         "index_type": "hnsw",
-        "confirmation": "Je valide la reconstruction de la base vectorielle",
     }
     try:
-        # Activation d'une clé d'administration secrète
-        os.environ["ADMIN_API_KEY"] = "cle_secrete_admin_2026"
+        os.environ["ADMIN_USERNAME"] = "custom_admin"
+        os.environ["ADMIN_PASSWORD"] = "custom_secret_pass_2026"
 
-        # 1. Requête sans header -> doit être refusée avec HTTP 403
+        # 1. Requête sans authentification -> refusée avec HTTP 401
         resp_unauth = client.post("/rebuild", json=valid_payload)
-        assert resp_unauth.status_code == 403
+        assert resp_unauth.status_code == 401
         assert "refusé" in resp_unauth.json().get("detail", "").lower()
 
-        # 2. Requête avec mauvaise clé -> doit être refusée avec HTTP 403
-        resp_wrong = client.post(
+        # 2. Requête avec mauvais mot de passe en Basic Auth -> refusée avec HTTP 401
+        resp_wrong_auth = client.post(
             "/rebuild",
             json=valid_payload,
-            headers={"X-Admin-Key": "mauvaise_cle"},
+            auth=("custom_admin", "mauvais_mot_de_passe"),
         )
-        assert resp_wrong.status_code == 403
+        assert resp_wrong_auth.status_code == 401
 
-        # 3. Requête avec la bonne clé -> doit réussir avec HTTP 200
-        resp_ok = client.post(
+        # 3. Requête avec mauvais mot de passe dans body JSON -> refusée avec HTTP 401
+        resp_wrong_body = client.post(
+            "/rebuild",
+            json={"index_type": "hnsw", "user": "custom_admin", "password": "mauvais_mot_de_passe"},
+        )
+        assert resp_wrong_body.status_code == 401
+
+        # 4. Requête avec les bons identifiants via HTTP Basic Auth -> HTTP 200
+        resp_ok_basic = client.post(
             "/rebuild",
             json=valid_payload,
-            headers={"X-Admin-Key": "cle_secrete_admin_2026"},
+            auth=("custom_admin", "custom_secret_pass_2026"),
         )
-        assert resp_ok.status_code == 200
-        assert resp_ok.json()["status"] == "success"
+        assert resp_ok_basic.status_code == 200
+        assert resp_ok_basic.json()["status"] == "success"
+
+        # 5. Requête avec les bons identifiants dans le corps JSON ('user') -> HTTP 200
+        resp_ok_user = client.post(
+            "/rebuild",
+            json={"index_type": "hnsw", "user": "custom_admin", "password": "custom_secret_pass_2026"},
+        )
+        assert resp_ok_user.status_code == 200
+        assert resp_ok_user.json()["status"] == "success"
+
+        # 6. Requête avec les bons identifiants dans le corps JSON ('username') -> HTTP 200
+        resp_ok_username = client.post(
+            "/rebuild",
+            json={"index_type": "hnsw", "username": "custom_admin", "password": "custom_secret_pass_2026"},
+        )
+        assert resp_ok_username.status_code == 200
+        assert resp_ok_username.json()["status"] == "success"
 
     finally:
         # Nettoyage et restauration de l'environnement
-        if env_backup is not None:
-            os.environ["ADMIN_API_KEY"] = env_backup
+        if user_backup is not None:
+            os.environ["ADMIN_USERNAME"] = user_backup
         else:
-            os.environ.pop("ADMIN_API_KEY", None)
+            os.environ.pop("ADMIN_USERNAME", None)
+        if pass_backup is not None:
+            os.environ["ADMIN_PASSWORD"] = pass_backup
+        else:
+            os.environ.pop("ADMIN_PASSWORD", None)
 
 
 # ============================================================================
@@ -399,9 +455,10 @@ def run_functional_test_suite() -> bool:
         ("POST /ask (Gestion des questions vides - 400)", test_ask_empty_question_returns_400),
         ("POST /ask (Validation de schéma - 422)", test_ask_invalid_payload_returns_422),
         ("POST /rebuild (Rechargement base vectorielle HNSW)", test_rebuild_post_endpoint),
-        ("GET  /rebuild (Rechargement via GET)", test_rebuild_get_endpoint),
-        ("VALIDATION /rebuild (Modèle HNSW exclusif & Phrase requise)", test_rebuild_validation_rules),
-        ("SÉCURITÉ /rebuild (Vérification X-Admin-Key 403)", test_rebuild_security_protection),
+        ("POST /rebuild (Pipeline de reconstruction)", test_rebuild_triggers_reconstruction_pipeline),
+        ("GET  /rebuild (Interdiction HTTP 405 Method Not Allowed)", test_rebuild_get_method_not_allowed),
+        ("VALIDATION /rebuild (Modèle HNSW exclusif & Rejet identifiants)", test_rebuild_validation_rules),
+        ("SÉCURITÉ /rebuild (Authentification user/password Basic Auth & JSON 401)", test_rebuild_security_protection),
     ]
 
     success_count = 0

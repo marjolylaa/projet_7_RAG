@@ -190,20 +190,20 @@ L'API REST est développée avec **FastAPI** ([src/api.py](/src/api.py)), exécu
 | `GET` | `/ui` | Accès direct explicite à l'interface graphique HTML. | 200 |
 | `GET` | `/health` | Contrôle de santé : statut opérationnel, modèle LLM, total de vecteurs. | 200, 503 |
 | `POST` | `/ask` | Pose une question au moteur RAG avec sélection du `top_k`. | 200, 400, 422, 500 |
-| `POST` | `/rebuild` | Recharge à chaud l'index FAISS HNSW en mémoire (sécurisé). | 200, 400, 403 |
-| `GET` | `/rebuild` | Alias GET pour le rechargement de l'index avec confirmation. | 200, 400, 403 |
+| `POST` | `/rebuild` | Reconstruit la base vectorielle HNSW depuis OpenAgenda + Mistral Embeddings et recharge l'index à chaud (sécurisé par user/mot de passe, paramètre `limit` optionnel). | 200, 400, 401, 500 |
 | `GET` | `/docs` | Documentation interactive Swagger UI OpenAPI 3.x. | 200 |
 
 ### Sécurité et validation
-- **Protection de `/rebuild` :**
-  1. Phrase de confirmation obligatoire : `"Je valide la reconstruction de la base vectorielle"`.
+- **Protection et fonctionnalités de `/rebuild` :**
+  1. Authentification administrateur obligatoire par nom d'utilisateur et mot de passe : transmise soit via **HTTP Basic Auth** (`Authorization: Basic base64(user:password)`, compatible `curl -u` et dialogue Swagger UI), soit dans le corps JSON (`user` ou `username` et `password`). Rejet strict avec code `HTTP 401 Unauthorized` si les identifiants sont absents ou invalides.
   2. Restriction exclusive : paramètre `index_type="hnsw"` obligatoire (rejet HTTP 400 des autres types).
-  3. Header d'authentification `X-Admin-Key` requis si la variable d'environnement `ADMIN_API_KEY` est activée (rejet HTTP 403).
+  3. Paramètre optionnel `limit` permettant de reconstruire sur un sous-ensemble d'événements (ex: 50 pour un test ou une démonstration rapide).
+  4. Pipeline complet exécuté : téléchargement OpenAgenda, embeddings `mistral-embed` (via la variable d'environnement `MISTRAL_API_KEY`), construction du graphe HNSW, sauvegarde sur disque et rechargement en mémoire.
 - **Validation des entrées :** Rejet HTTP 400 des questions vides ou constituées d'espaces, rejet HTTP 422 en cas de payload invalide (validation Pydantic `top_k` compris entre 1 et 20).
 
 ### Exemple d'appel API
 
-#### Requête cURL :
+#### Requête cURL `/ask` :
 ```bash
 curl -X POST "http://localhost:8000/ask" \
   -H "Content-Type: application/json" \
@@ -213,7 +213,29 @@ curl -X POST "http://localhost:8000/ask" \
   }'
 ```
 
-#### Réponse JSON :
+#### Requête cURL `/rebuild` (via HTTP Basic Auth) :
+```bash
+curl -u admin:le_mot_de_passe -X POST "http://localhost:8000/rebuild" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "index_type": "hnsw",
+    "limit": 50
+  }'
+```
+
+#### Requête cURL `/rebuild` (via corps JSON) :
+```bash
+curl -X POST "http://localhost:8000/rebuild" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "index_type": "hnsw",
+    "user": "admin",
+    "password": "le_mot_de_passe",
+    "limit": 50
+  }'
+```
+
+#### Réponse JSON `/ask` :
 ```json
 {
   "question": "Quels sont les concerts de jazz prévus cet été dans l'Oise ?",
@@ -287,7 +309,7 @@ graph LR
 1. **Vitesse de recherche exceptionnelle :** Grâce à FAISS HNSW, le temps d'interrogation vectoriel est inférieur à la milliseconde (< 1 ms).
 2. **Ancrage factuel et intégrité :** Aucune hallucination détectée sur les détails critiques (tarifs, adresses, dates).
 3. **Architecture logicielle propre :** Séparation claire entre l'ingestion, le moteur métier RAG, l'API FastAPI et les tests.
-4. **Tests automatisés 100 % hors-ligne :** 32 tests unitaires et d'intégration validés sans consommer le moindre crédit d'API Mistral et exécutés automatiquement en CI GitHub Actions.
+4. **Tests automatisés 100 % hors-ligne :** 35 tests unitaires et d'intégration validés sans consommer le moindre crédit d'API Mistral et exécutés automatiquement en CI GitHub Actions.
 
 ### Limites identifiées du POC
 1. **Recherche dense pure :** Sur certains mots-clés orthographiés de façon atypique ou noms propres très rares, la recherche vectorielle pure peut être prise en défaut par rapport à une recherche textuelle exacte.

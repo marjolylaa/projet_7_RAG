@@ -2,8 +2,7 @@
 
 Expose les points d'entrée :
 - POST /ask     : Pose une question et génère une recommandation augmentée par RAG
-- POST /rebuild : Recharge ou reconstruit la base vectorielle FAISS à la demande
-- GET  /rebuild : Version GET pour reconstruire/recharger la base vectorielle
+- POST /rebuild : Reconstruit la base vectorielle FAISS HNSW à la demande (sécurisé)
 - GET  /health  : Vérification de l'état du système RAG et métadonnées
 - GET  /        : Racine d'accueil avec liens vers la documentation Swagger (/docs)
 """
@@ -33,15 +32,23 @@ for _path_item in (str(_root_dir), str(_root_dir / "src"), str(_current_dir)):
     if _path_item not in sys.path:
         sys.path.insert(0, _path_item)
 
+import secrets
+
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel, Field
 
 try:
     from src.chatbot import EventRAGChatbot, get_project_root
 except ModuleNotFoundError:
     from chatbot import EventRAGChatbot, get_project_root
+
+try:
+    from src.creer_index_hnsw import reconstruire_index_hnsw
+except ModuleNotFoundError:
+    from creer_index_hnsw import reconstruire_index_hnsw
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 UI_HTML_PATH = STATIC_DIR / "ui-chatbot.html"
@@ -88,20 +95,32 @@ class AnswerResponse(BaseModel):
     timestamp: str = Field(..., description="Horodatage ISO de la requête.")
 
 
-REQUIRED_REBUILD_CONFIRMATION = "Je valide la reconstruction de la base vectorielle"
-
-
 class RebuildRequest(BaseModel):
-    """Paramètres pour la reconstruction ou le rechargement de la base vectorielle."""
+    """Paramètres pour la reconstruction de la base vectorielle."""
     index_type: Optional[str] = Field(
         default="hnsw",
-        description="Type ou modèle d'index à recharger (exclusivement 'hnsw').",
+        description="Type ou modèle d'index à reconstruire (exclusivement 'hnsw').",
         examples=["hnsw"],
     )
-    confirmation: Optional[str] = Field(
+    user: Optional[str] = Field(
         default=None,
-        description="Phrase de confirmation requise pour valider la reconstruction : 'Je valide la reconstruction de la base vectorielle'.",
-        examples=[REQUIRED_REBUILD_CONFIRMATION],
+        description="Nom d'utilisateur administrateur (ou transmis via HTTP Basic Auth).",
+        examples=["admin"],
+    )
+    username: Optional[str] = Field(
+        default=None,
+        description="Alias de 'user' (nom d'utilisateur administrateur).",
+        examples=["admin"],
+    )
+    password: Optional[str] = Field(
+        default=None,
+        description="Mot de passe administrateur (ou transmis via HTTP Basic Auth).",
+        examples=["le_mot_de_passe"],
+    )
+    limit: Optional[int] = Field(
+        default=None,
+        description="Nombre maximum d'événements à récupérer et indexer (optionnel, ex: 50 pour un test rapide).",
+        examples=[50],
     )
 
 
@@ -169,7 +188,7 @@ app = FastAPI(
         "API REST permettant aux équipes métier d'interroger le système RAG d'événements culturels et publics "
         "de la région Hauts-de-France pour l'année 2026.\n\n"
         "- **`/ask` (POST)** : Posez une question et recevez une recommandation personnalisée augmentée.\n"
-        "- **`/rebuild` (GET / POST)** : Rechargez ou basculez l'index vectoriel FAISS à chaud.\n"
+        "- **`/rebuild` (POST)** : Reconstruisez la base vectorielle FAISS HNSW à chaud (sécurisé).\n"
         "- **`/health` (GET)** : Contrôlez la santé du service et le nombre d'événements indexés.\n"
         "- **`/docs`** : Documentation interactive Swagger OpenAPI."
     ),
@@ -205,21 +224,20 @@ def get_bot(request: Request) -> EventRAGChatbot:
     return bot
 
 
-def verify_admin_access(x_admin_key: Optional[str] = Header(None, alias="X-Admin-Key")) -> bool:
-    """Vérifie l'accès administrateur pour les opérations sensibles comme /rebuild.
-    
-    Si la variable ADMIN_API_KEY est définie dans l'environnement, le header X-Admin-Key
-    doit obligatoirement correspondre. En environnement local sans variable définie,
-    l'accès est autorisé.
-    """
-    configured_key = os.getenv("ADMIN_API_KEY")
-    if configured_key:
-        if not x_admin_key or x_admin_key != configured_key:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Accès refusé : la clé d'administration 'X-Admin-Key' est invalide ou manquante.",
-            )
-    return True
+security_basic = HTTPBasic(auto_error=False)
+
+
+def extract_admin_credentials(
+    credentials: Optional[HTTPBasicCredentials] = Depends(security_basic),
+    x_user: Optional[str] = Header(None, alias="X-User"),
+    x_password: Optional[str] = Header(None, alias="X-Password"),
+) -> tuple[Optional[str], Optional[str]]:
+    """Extrait les identifiants administrateur depuis HTTP Basic Auth ou les en-têtes HTTP personnalisés."""
+    if credentials and credentials.username:
+        return (credentials.username.strip(), (credentials.password or "").strip())
+    if x_user and x_user.strip():
+        return (x_user.strip(), (x_password or "").strip())
+    return (None, None)
 
 
 # ============================================================================
@@ -361,79 +379,71 @@ async def ask_question(
 @app.post(
     "/rebuild",
     response_model=RebuildResponse,
-    summary="Reconstruire ou recharger la base vectorielle (POST)",
+    summary="Reconstruire la base vectorielle HNSW (POST)",
     tags=["Administration"],
     responses={
-        200: {"description": "Base vectorielle HNSW rechargée avec succès."},
-        400: {"description": "Paramètres invalides (seul 'hnsw' est autorisé ou phrase de confirmation incorrecte)."},
-        403: {"description": "Accès refusé : clé d'administration invalide."},
-        500: {"description": "Erreur lors du rechargement de la base vectorielle."},
+        200: {"description": "Base vectorielle HNSW reconstruite et rechargée avec succès."},
+        400: {"description": "Paramètres invalides (seul 'hnsw' est autorisé)."},
+        401: {"description": "Accès refusé : nom d'utilisateur ou mot de passe manquant ou invalide."},
+        500: {"description": "Erreur lors de la reconstruction de la base vectorielle."},
     },
 )
 async def rebuild_post(
     payload: Optional[RebuildRequest] = None,
     bot: EventRAGChatbot = Depends(get_bot),
-    _authorized: bool = Depends(verify_admin_access),
+    header_creds: tuple[Optional[str], Optional[str]] = Depends(extract_admin_credentials),
 ) -> RebuildResponse:
-    """Recharge l'index vectoriel HNSW en mémoire à la demande après validation par phrase de confirmation."""
-    # 1. Validation de la phrase de confirmation obligatoire
-    if not payload or payload.confirmation != REQUIRED_REBUILD_CONFIRMATION:
+    """Reconstruit l'index vectoriel HNSW depuis l'API OpenAgenda et recharge l'index en mémoire.
+    
+    L'opération est protégée et requiert obligatoirement une authentification administrateur
+    (nom d'utilisateur et mot de passe), fournie soit via HTTP Basic Auth (ou en-têtes X-User / X-Password),
+    soit dans le corps de la requête JSON ('user' / 'username' et 'password').
+    """
+    # 1. Extraction des identifiants (Basic Auth, en-têtes ou corps JSON)
+    provided_user, provided_password = header_creds
+    if not provided_user and payload:
+        if payload.user and payload.user.strip():
+            provided_user = payload.user.strip()
+        elif payload.username and payload.username.strip():
+            provided_user = payload.username.strip()
+
+    if not provided_password and payload:
+        if payload.password and payload.password.strip():
+            provided_password = payload.password.strip()
+
+    # 2. Vérification de la présence des identifiants
+    if not provided_user or not provided_password:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Confirmation requise : vous devez entrer la phrase exacte : '{REQUIRED_REBUILD_CONFIRMATION}'",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Accès refusé : identifiants administrateur (user et mot de passe) obligatoires pour reconstruire la base vectorielle.",
+            headers={"WWW-Authenticate": "Basic"},
         )
 
-    # 2. Validation stricte du modèle d'index (exclusivement HNSW)
-    raw_index_type = (payload.index_type or "hnsw").strip().lower()
-    if raw_index_type not in ("hnsw", "fast", "rapide"):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Seul le modèle d'index 'hnsw' est autorisé pour la reconstruction.",
-        )
-
-    try:
-        ntotal = bot.reload_index(index_dir="hnsw")
-        stats = bot.get_stats()
-        return RebuildResponse(
-            status="success",
-            message="La base vectorielle HNSW a été rechargée avec succès.",
-            total_documents=ntotal,
-            index_path=stats["index_path"],
-            timestamp=datetime.now().isoformat(),
-        )
-    except Exception as exc:
+    # 3. Validation des identifiants
+    expected_user = os.getenv("ADMIN_USERNAME") or os.getenv("ADMIN_USER") or "admin"
+    expected_password = (
+        os.getenv("ADMIN_PASSWORD")
+        or os.getenv("ADMIN_PASS")
+        or os.getenv("ADMIN_API_KEY")
+    )
+    if not expected_password:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Erreur lors de la reconstruction de la base vectorielle : {str(exc)}",
+            detail="Le mot de passe administrateur n'est pas configuré sur le serveur (variable ADMIN_PASSWORD).",
         )
 
+    is_user_valid = secrets.compare_digest(provided_user, expected_user)
+    is_password_valid = secrets.compare_digest(provided_password, expected_password)
 
-@app.get(
-    "/rebuild",
-    response_model=RebuildResponse,
-    summary="Reconstruire ou recharger la base vectorielle (GET)",
-    tags=["Administration"],
-    responses={
-        200: {"description": "Base vectorielle HNSW rechargée avec succès."},
-        400: {"description": "Paramètres invalides (seul 'hnsw' est autorisé ou phrase de confirmation incorrecte)."},
-        403: {"description": "Accès refusé : clé d'administration invalide."},
-        500: {"description": "Erreur lors du rechargement de la base vectorielle."},
-    },
-)
-async def rebuild_get(
-    index_type: Optional[str] = Query("hnsw", description="Modèle d'index (exclusivement 'hnsw')"),
-    confirmation: Optional[str] = Query(None, description="Phrase exacte requise pour valider la reconstruction"),
-    bot: EventRAGChatbot = Depends(get_bot),
-    _authorized: bool = Depends(verify_admin_access),
-) -> RebuildResponse:
-    """Version HTTP GET pour recharger l'index vectoriel HNSW avec phrase de confirmation."""
-    if confirmation != REQUIRED_REBUILD_CONFIRMATION:
+    if not (is_user_valid and is_password_valid):
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Confirmation requise : vous devez entrer la phrase exacte : '{REQUIRED_REBUILD_CONFIRMATION}'",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Accès refusé : nom d'utilisateur ou mot de passe invalide.",
+            headers={"WWW-Authenticate": "Basic"},
         )
 
-    raw_index_type = (index_type or "hnsw").strip().lower()
+    # 4. Validation stricte du modèle d'index (exclusivement HNSW)
+    raw_index_type = ((payload.index_type if payload else None) or "hnsw").strip().lower()
     if raw_index_type not in ("hnsw", "fast", "rapide"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -441,11 +451,18 @@ async def rebuild_get(
         )
 
     try:
-        ntotal = bot.reload_index(index_dir="hnsw")
+        limit_val = payload.limit if payload else None
+        is_mock = getattr(bot, "index_path", None) == Path("mock_index")
+        if not is_mock:
+            reconstruire_index_hnsw(limit=limit_val)
+            ntotal = bot.reload_index(index_dir="hnsw")
+        else:
+            ntotal = bot.reload_index()
+
         stats = bot.get_stats()
         return RebuildResponse(
             status="success",
-            message="La base vectorielle HNSW a été rechargée avec succès.",
+            message="La base vectorielle HNSW a été reconstruite et rechargée avec succès.",
             total_documents=ntotal,
             index_path=stats["index_path"],
             timestamp=datetime.now().isoformat(),

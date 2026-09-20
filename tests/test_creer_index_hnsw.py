@@ -15,7 +15,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.creer_index_hnsw import main
+from src.creer_index_hnsw import main, reconstruire_index_hnsw
 
 
 @pytest.fixture
@@ -264,3 +264,52 @@ def test_dry_mode_runpy_entrypoint(fake_openagenda_records, capsys):
 
     captured = capsys.readouterr().out
     assert "Mode DRY activé : simulation terminée" in captured
+
+
+def test_reconstruire_index_hnsw_dry_mode(fake_openagenda_records):
+    """Vérifie que la fonction reconstruire_index_hnsw s'exécute en mode dry et retourne 0."""
+    mock_response = MagicMock()
+    mock_response.json.return_value = fake_openagenda_records
+    mock_response.raise_for_status.return_value = None
+
+    with patch("requests.get", return_value=mock_response):
+        count = reconstruire_index_hnsw(dry=True, api_key="test_key")
+
+    assert count == 0
+
+
+def test_reconstruire_index_hnsw_full_pipeline_mocked(fake_openagenda_records, tmp_path):
+    """Vérifie l'exécution complète de reconstruire_index_hnsw avec mocks sans appel réseau réel."""
+    mock_response = MagicMock()
+    mock_response.json.return_value = fake_openagenda_records
+    mock_response.raise_for_status.return_value = None
+
+    # Simuler le client Mistral retournant 2 embeddings (2 descriptions valides)
+    mock_mistral_client = MagicMock()
+    mock_mistral_client.embeddings.create.return_value = MagicMock(
+        data=[
+            MagicMock(embedding=[0.05] * 1024),
+            MagicMock(embedding=[0.10] * 1024),
+        ]
+    )
+
+    out_dir = tmp_path / "test_rebuilt_hnsw"
+
+    with patch("requests.get", return_value=mock_response):
+        with patch("src.creer_index_hnsw.Mistral", return_value=mock_mistral_client):
+            with patch("src.creer_index_hnsw.time.sleep"):  # Pas d'attente réelle
+                with patch("src.creer_index_hnsw.FAISS") as mock_faiss_class:
+                    mock_vs = MagicMock()
+                    mock_faiss_class.return_value = mock_vs
+                    count = reconstruire_index_hnsw(
+                        limit=2,
+                        dry=False,
+                        output_path=out_dir,
+                        api_key="mock_key",
+                    )
+
+    assert count == 2
+    mock_faiss_class.assert_called_once()
+    mock_vs.add_embeddings.assert_called_once()
+    mock_vs.save_local.assert_called_once_with(str(out_dir))
+

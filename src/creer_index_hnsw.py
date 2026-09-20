@@ -18,6 +18,7 @@ import time
 import uuid
 import warnings
 from pathlib import Path
+from typing import Optional, Union
 
 import faiss
 import numpy as np
@@ -40,37 +41,36 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-def main(argv=None):
-    # Arguments CLI
-    parser = argparse.ArgumentParser(description="Création de la base vectorielle FAISS HNSW.")
-    parser.add_argument(
-        "--limit", "-l",
-        type=int,
-        default=None,
-        help="Nombre maximum d'événements à récupérer pour un index réduit (ex: --limit 50).",
-    )
-    parser.add_argument(
-        "--dry", "--dry-run",
-        action="store_true",
-        dest="dry",
-        help="Mode simulation : teste la récupération des données sans appeler l'API d'embeddings.",
-    )
-    args = parser.parse_args(argv)
 
-    # Chargement du fichier .env
-    root_dir = Path(__file__).resolve().parent.parent
-    env_file = Path(__file__).resolve().parent / ".env"
-    if env_file.exists():
-        load_dotenv(dotenv_path=env_file)
-    else:
-        load_dotenv()
+def reconstruire_index_hnsw(
+    limit: Optional[int] = None,
+    dry: bool = False,
+    output_path: Optional[Union[Path, str]] = None,
+    api_key: Optional[str] = None,
+) -> int:
+    """Récupère les événements 2026 depuis l'API OpenAgenda, calcule les embeddings Mistral et sauvegarde l'index FAISS HNSW.
 
-    api_key = os.environ.get("MISTRAL_API_KEY")
-    if not api_key and not args.dry:
+    Args:
+        limit: Nombre maximum d'événements à récupérer pour créer un index réduit (ex: 50).
+        dry: Mode simulation (récupère les données sans appeler l'API d'embeddings ni écrire sur disque).
+        output_path: Chemin du répertoire de sauvegarde de l'index (par défaut src/mon_index_langchain_evenements_hnsw_rapide).
+        api_key: Clé API Mistral (si non fournie, lue depuis la variable d'environnement MISTRAL_API_KEY).
+
+    Returns:
+        int: Nombre de documents indexés (ou 0 si mode dry ou aucun document).
+    """
+    if not api_key:
+        env_file = Path(__file__).resolve().parent / ".env"
+        if env_file.exists():
+            load_dotenv(dotenv_path=env_file)
+        else:
+            load_dotenv()
+        api_key = os.environ.get("MISTRAL_API_KEY")
+
+    if not api_key and not dry:
         raise ValueError("La variable MISTRAL_API_KEY est manquante dans l'environnement.")
 
     model = "mistral-embed"
-
 
     # ============================================================================
     # 1. Récupération des données via l'API OpenAgenda
@@ -86,8 +86,8 @@ def main(argv=None):
 
     while True:
         current_limit = 100
-        if args.limit:
-            remaining = args.limit - len(liste_resultats)
+        if limit:
+            remaining = limit - len(liste_resultats)
             if remaining <= 0:
                 break
             current_limit = min(100, remaining)
@@ -109,15 +109,14 @@ def main(argv=None):
         offset += len(batch)
 
         total_count = donnees.get("total_count", 0)
-        target = min(total_count, args.limit) if args.limit else total_count
+        target = min(total_count, limit) if limit else total_count
         print(f"Téléchargement : {len(liste_resultats)} / {target} événements", end="\r")
-        if offset >= total_count or (args.limit and len(liste_resultats) >= args.limit):
+        if offset >= total_count or (limit and len(liste_resultats) >= limit):
             break
 
     print()
     evenement_pd = pd.DataFrame(liste_resultats)
     print(f"taille data : {len(evenement_pd)}")
-
 
     # ============================================================================
     # 2. Vectorisation des descriptions
@@ -131,8 +130,12 @@ def main(argv=None):
         descriptions_to_embed = []
     print(f"Descriptions valides à vectoriser : {len(descriptions_to_embed)}")
 
-    if args.dry:
+    if dry:
         print("🔍 Mode DRY activé : simulation terminée (aucun appel d'embeddings ni écriture sur disque).")
+        return 0
+
+    if not descriptions_to_embed:
+        print("⚠️ Aucune description valide à vectoriser.")
         return 0
 
     client = Mistral(api_key=api_key)
@@ -156,22 +159,18 @@ def main(argv=None):
 
     # Insertion dans FAISS
     vecteurs_numpy = np.array(tous_les_embeddings).astype("float32")
-    dimension = vecteurs_numpy.shape[1]
+    dimension = 1024  # Le modèle 'mistral-embed' génère des vecteurs de 1024 dimensions
+    liens_par_noeud = 32  # Paramètre HNSW
 
     df_metadata = evenement_pd.drop(columns=[col_desc])
     metadatas = df_metadata.to_dict(orient="records")
 
     textes_et_vecteurs = list(zip(descriptions_to_embed, vecteurs_numpy))
-    embeddings = MistralAIEmbeddings(model=model)
-
+    embeddings = MistralAIEmbeddings(model=model, mistral_api_key=api_key)
 
     # ============================================================================
     # 3. Création et sauvegarde de l'index HNSW
     # ============================================================================
-
-    # Configuration de l'algorithme HNSW
-    dimension = 1024  # Le modèle 'mistral-embed' génère des vecteurs de 1024 dimensions
-    liens_par_noeud = 32  # Paramètre HNSW
 
     index_optimise = faiss.IndexHNSWFlat(dimension, liens_par_noeud)
 
@@ -192,9 +191,35 @@ def main(argv=None):
     )
 
     # Sauvegarde de la nouvelle base super-rapide
-    output_path = Path(__file__).resolve().parent / "mon_index_langchain_evenements_hnsw_rapide"
-    vector_store.save_local(str(output_path))
+    if output_path is None:
+        target_path = Path(__file__).resolve().parent / "mon_index_langchain_evenements_hnsw_rapide"
+    else:
+        target_path = Path(output_path)
+
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+    vector_store.save_local(str(target_path))
     print("✅ Index HNSW optimisé et sauvegardé !")
+    return len(descriptions_to_embed)
+
+
+def main(argv=None):
+    # Arguments CLI
+    parser = argparse.ArgumentParser(description="Création de la base vectorielle FAISS HNSW.")
+    parser.add_argument(
+        "--limit", "-l",
+        type=int,
+        default=None,
+        help="Nombre maximum d'événements à récupérer pour un index réduit (ex: --limit 50).",
+    )
+    parser.add_argument(
+        "--dry", "--dry-run",
+        action="store_true",
+        dest="dry",
+        help="Mode simulation : teste la récupération des données sans appeler l'API d'embeddings.",
+    )
+    args = parser.parse_args(argv)
+
+    reconstruire_index_hnsw(limit=args.limit, dry=args.dry)
     return 0
 
 
