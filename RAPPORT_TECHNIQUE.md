@@ -40,32 +40,7 @@ Démontrer la faisabilité technique, la pertinence métier et la viabilité op�
 
 ### Schéma global d'architecture
 
-```mermaid
-flowchart TD
-    subgraph DataIngestion ["1. Ingestion & Indexation"]
-        OA["API Publique OpenAgenda\n(OpenDataSoft API v2.1)"] -->|"Extraction JSON paginée\n(filtre HDF 2026)"| IngestScript["src/creer_index_hnsw.py"]
-        IngestScript -->|"Nettoyage & Filtrage"| CleanData["DataFrame Pandas"]
-        CleanData -->|"Lots de 100 textes"| EmbedAPI["API Mistral AI\n(mistral-embed : 1024d)"]
-        EmbedAPI -->|"Vecteurs float32 + Métadonnées"| FAISS_HNSW["Index FAISS HNSW\n(src/mon_index_langchain_evenements_hnsw_rapide)"]
-    end
-
-    subgraph RAGCore ["2. Moteur Métier RAG (LangChain)"]
-        UserQuery["Question Utilisateur"] -->|"Saisie"| Engine["EventRAGChatbot\n(src/chatbot.py)"]
-        Engine -->|"1. Similarité sémantique (top-k)"| FAISS_HNSW
-        FAISS_HNSW -->|"Candidats bruts + scores L2"| ReRank["Re-ranking & Déduplication\n(boosts ville, lieu, titre)"]
-        ReRank -->|"Documents pertinents formatés"| Prompt["ChatPromptTemplate\n(Consignes anti-hallucination)"]
-        UserQuery --> Prompt
-        Prompt -->|"Contexte + Question"| MistralLLM["LLM Mistral AI\n(open-mistral-nemo)"]
-        MistralLLM -->|"Réponse argumentée"| Parser["StrOutputParser"]
-    end
-
-    subgraph Delivery ["3. Exposition & Interfaces"]
-        Parser --> RestAPI["API REST FastAPI\n(src/api.py)"]
-        RestAPI -->|"JSON : réponse + sources + latence"| WebUI["Interface Web Graphique\n(src/static/ui-chatbot.html)"]
-        RestAPI -->|"Documentation OpenAPI"| SwaggerUI["Swagger UI (/docs)\n& ReDoc (/redoc)"]
-        RestAPI -->|"CLI Terminal"| Console["Console de Test\n(src/cli.py)"]
-    end
-```
+![Schéma global d'architecture RAG](diagram_uml.png)
 
 ### Technologies utilisées
 

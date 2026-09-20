@@ -55,9 +55,15 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from pydantic import BaseModel, Field
 
 try:
-    from src.chatbot import EventRAGChatbot, get_project_root
+    from src.chatbot import EventRAGChatbot, get_project_root, setup_environment
 except ModuleNotFoundError:
-    from chatbot import EventRAGChatbot, get_project_root
+    from chatbot import EventRAGChatbot, get_project_root, setup_environment
+
+# Chargement automatique des variables d'environnement depuis le fichier .env
+try:
+    setup_environment()
+except Exception:
+    pass
 
 try:
     from src.creer_index_hnsw import reconstruire_index_hnsw
@@ -445,12 +451,8 @@ async def rebuild_post(
         )
 
     # 3. Validation des identifiants
-    expected_user = os.getenv("ADMIN_USERNAME") or os.getenv("ADMIN_USER") or "admin"
-    expected_password = (
-        os.getenv("ADMIN_PASSWORD")
-        or os.getenv("ADMIN_PASS")
-        or os.getenv("ADMIN_API_KEY")
-    )
+    expected_user = os.getenv("ADMIN_USERNAME") or "admin"
+    expected_password = os.getenv("ADMIN_PASSWORD")
     if not expected_password:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

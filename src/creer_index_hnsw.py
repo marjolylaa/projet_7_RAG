@@ -60,7 +60,8 @@ def reconstruire_index_hnsw(
         int: Nombre de documents indexés (ou 0 si mode dry ou aucun document).
     """
     if not api_key:
-        env_file = Path(__file__).resolve().parent / ".env"
+        root_dir = Path(__file__).resolve().parent.parent if Path(__file__).resolve().parent.name == "src" else Path(__file__).resolve().parent
+        env_file = root_dir / ".env"
         if env_file.exists():
             load_dotenv(dotenv_path=env_file)
         else:

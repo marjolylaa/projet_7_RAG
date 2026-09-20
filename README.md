@@ -18,10 +18,18 @@ uv sync
 
 ### 2. Configuration
 
-Ajouter un fichier `.env` dans le dossier `src/` avec votre clé d'API Mistral :
+Créer un fichier `.env` à la racine du projet à partir du modèle fourni :
+
+```bash
+cp .env.example .env   # ou sous Windows: copy .env.example .env
+```
+
+Puis renseigner votre clé d'API Mistral et vos identifiants d'administration dans ce fichier `.env` unique :
 
 ```env
-MISTRAL_API_KEY=votre_cle_api
+MISTRAL_API_KEY=votre_cle_api_mistral
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=votre_mot_de_passe
 ```
 
 ---
@@ -88,15 +96,15 @@ uv run python main.py --serve
 - **Documentation ReDoc** : [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
 - **Santé & Métadonnées** : `GET http://127.0.0.1:8000/health`
 - **Poser une question** : `POST http://127.0.0.1:8000/ask` (body : `{"question": "...", "top_k": 4}`)
-- **Recharger / Reconstruire l'index** : `POST http://127.0.0.1:8000/rebuild` ou `GET http://127.0.0.1:8000/rebuild`
-  *(Protégé par saisie de phrase de confirmation dans l'UI et header `X-Admin-Key` si `ADMIN_API_KEY` est configuré)*
+- **Recharger / Reconstruire l'index** : `POST http://127.0.0.1:8000/rebuild`
+  *(Protégé par authentification HTTP Basic Auth ou identifiants JSON via `ADMIN_USERNAME` et `ADMIN_PASSWORD`)*
 
 ### 6. Déploiement avec Docker & Docker Compose
 
 Le chatbot est entièrement conteneurisé. Au démarrage du conteneur, l'application affiche immédiatement dans les logs Docker les URL directes d'accès à l'application.
 
 #### Méthode A : Avec Docker Compose (Recommandé)
-Le fichier `docker-compose.yml` configure automatiquement le port, la politique de redémarrage, le healthcheck et charge votre clé depuis `src/.env` :
+Le fichier `docker-compose.yml` configure automatiquement le port, la politique de redémarrage, le healthcheck et charge vos variables d'environnement directement depuis le fichier `.env` à la racine :
 
 ```bash
 # Construire et lancer le conteneur en arrière-plan
@@ -114,11 +122,11 @@ docker compose down
 # 1. Construction de l'image Docker
 docker build -t rag-evenements-chatbot .
 
-# 2. Lancement du conteneur en passant la clé d'API Mistral
+# 2. Lancement du conteneur avec le fichier d'environnement 
 docker run -d \
   --name rag-chatbot \
   -p 8000:8000 \
-  -e MISTRAL_API_KEY="votre_cle_api_mistral" \
+  --env-file .env \
   rag-evenements-chatbot
 
 # 3. Affichage des logs et des URL d'accès
@@ -175,8 +183,13 @@ Sur un corpus de ~24 700 événements indexés :
 
 ```text
 projet_7_systeme_RAG/
+├── .env                                            # Configuration locale & Docker (non versionné)
+├── .env.example                                    # Modèle documenté des variables d'environnement
+├── .gitattributes                                  # Configuration Git (binaires & fins de ligne)
+├── diagram_uml.png                                 # Schéma d'architecture global du système RAG généré avec plantuml
 ├── Dockerfile                                      # Image Docker multi-plateforme optimisée
 ├── docker-compose.yml                              # Orchestration Docker Compose
+├── RAPPORT_TECHNIQUE.md                            # Rapport technique d'ingénierie et de soutenance
 ├── rapport/                                        # Rapports d'évaluation HTML générés
 │   └── rapport_evaluation.html
 ├── resources/                                      # Données brutes CSV
@@ -194,8 +207,7 @@ projet_7_systeme_RAG/
 │   │   └── rapport_template.html                   # Gabarit HTML Jinja2 du rapport d'évaluation
 │   ├── static/
 │   │   └── ui-chatbot.html                         # Interface Web graphique interactive
-│   ├── mon_index_langchain_evenements_hnsw_rapide/ # Index FAISS HNSW optimisé (inclus dans l'image)
-│   └── .env                                        # Clé API Mistral (non versionné)
+│   └── mon_index_langchain_evenements_hnsw_rapide/ # Index FAISS HNSW optimisé (inclus dans l'image)
 ├── tests/
 │   ├── conftest.py
 │   ├── test_api.py                                 # Tests fonctionnels et d'intégration de l'API REST

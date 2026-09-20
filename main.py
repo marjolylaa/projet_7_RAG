@@ -46,9 +46,7 @@ def status_check() -> None:
     """Affiche un rapport d'état du projet et les commandes disponibles."""
     root = get_project_root()
     index_path = root / "src" / "mon_index_langchain_evenements_hnsw_rapide"
-    env_file = root / "src" / ".env"
-    if not env_file.exists():
-        env_file = root / ".env"
+    env_file = root / ".env"
 
     print("=" * 75)
     print("🏛️  SYSTÈME RAG - ÉVÉNEMENTS HAUTS-DE-FRANCE 2026")

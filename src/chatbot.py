@@ -43,9 +43,7 @@ def setup_environment(env_file: Optional[Path] = None) -> None:
     root = get_project_root()
     candidates = [
         env_file,
-        root / "src" / ".env",
         root / ".env",
-        Path.cwd() / "src" / ".env",
         Path.cwd() / ".env",
     ]
     for path in candidates:
@@ -56,7 +54,7 @@ def setup_environment(env_file: Optional[Path] = None) -> None:
     if not os.getenv("MISTRAL_API_KEY"):
         raise ValueError(
             "La variable MISTRAL_API_KEY est introuvable. "
-            "Veuillez définir votre clé dans un fichier .env (ex: src/.env)."
+            "Veuillez définir votre clé dans le fichier .env à la racine du projet."
         )
 
 
