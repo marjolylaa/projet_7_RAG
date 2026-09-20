@@ -77,44 +77,73 @@ def reconstruire_index_hnsw(
     # ============================================================================
 
     headers = {"Content-Type": "application/json"}
-    base_url = "https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/evenements-publics-openagenda/records/"
     where = "YEAR(firstdate_begin) = 2026 AND YEAR(lastdate_begin) = 2026 AND location_region = 'Hauts-de-France'"
 
-    print("Récupération des données depuis l'API OpenAgenda...")
+    print("Récupération des données depuis l'API OpenAgenda...", flush=True)
     liste_resultats = []
-    offset = 0
 
-    while True:
-        current_limit = 100
+    # Si limit est None ou > 10000, l'endpoint /records/ de l'API OpenDataSoft échoue avec HTTP 400
+    # car la pagination par offset est plafonnée à offset + limit <= 10000.
+    # Dans ce cas, on utilise l'endpoint dédié /exports/json qui permet d'extraire tout le jeu de données
+    # en une seule requête sans limitation d'offset.
+    if limit is None or limit > 10000:
+        export_url = "https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/evenements-publics-openagenda/exports/json"
+        params = {
+            "lang": "fr",
+            "where": where,
+        }
         if limit:
+            params["limit"] = limit
+
+        response = requests.get(export_url, headers=headers, params=params, timeout=60)
+        response.raise_for_status()
+        donnees = response.json()
+
+        if isinstance(donnees, list):
+            liste_resultats = donnees
+        elif isinstance(donnees, dict):
+            liste_resultats = donnees.get("results", [])
+
+        print(f"Téléchargement : {len(liste_resultats)} événements récupérés", flush=True)
+
+    else:
+        # Pour limit <= 10000 (ex: tests ou limit explicite), pagination séquentielle via /records/
+        base_url = "https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/evenements-publics-openagenda/records/"
+        offset = 0
+        while True:
             remaining = limit - len(liste_resultats)
             if remaining <= 0:
                 break
             current_limit = min(100, remaining)
 
-        params = {
-            "lang": "fr",
-            "limit": current_limit,
-            "offset": offset,
-            "where": where,
-        }
-        response = requests.get(base_url, headers=headers, params=params, timeout=30)
-        response.raise_for_status()
-        donnees = response.json()
+            params = {
+                "lang": "fr",
+                "limit": current_limit,
+                "offset": offset,
+                "where": where,
+            }
+            response = requests.get(base_url, headers=headers, params=params, timeout=30)
+            response.raise_for_status()
+            donnees = response.json()
 
-        batch = donnees.get("results", [])
-        if not batch:
-            break
-        liste_resultats.extend(batch)
-        offset += len(batch)
+            if isinstance(donnees, list):
+                batch = donnees
+            elif isinstance(donnees, dict):
+                batch = donnees.get("results", [])
+            else:
+                batch = []
 
-        total_count = donnees.get("total_count", 0)
-        target = min(total_count, limit) if limit else total_count
-        print(f"Téléchargement : {len(liste_resultats)} / {target} événements", end="\r")
-        if offset >= total_count or (limit and len(liste_resultats) >= limit):
-            break
+            if not batch:
+                break
+            liste_resultats.extend(batch)
+            offset += len(batch)
 
-    print()
+            total_count = donnees.get("total_count", 0) if isinstance(donnees, dict) else len(liste_resultats)
+            target = min(total_count, limit) if limit else total_count
+            print(f"Téléchargement : {len(liste_resultats)} / {target} événements", end="\r", flush=True)
+            if offset >= total_count or len(liste_resultats) >= limit:
+                break
+        print(flush=True)
     evenement_pd = pd.DataFrame(liste_resultats)
     print(f"taille data : {len(evenement_pd)}")
 

@@ -215,16 +215,18 @@ curl -X POST "http://localhost:8000/ask" \
 
 #### Requête cURL `/rebuild` (via HTTP Basic Auth) :
 ```bash
+# Linux / macOS / Git Bash :
 curl -u admin:le_mot_de_passe -X POST "http://localhost:8000/rebuild" \
   -H "Content-Type: application/json" \
-  -d '{
-    "index_type": "hnsw",
-    "limit": 50
-  }'
+  -d '{"index_type": "hnsw", "limit": 50}'
+
+# Windows (PowerShell - utiliser curl.exe car 'curl' est un alias de Invoke-WebRequest) :
+curl.exe -u admin:le_mot_de_passe -X POST "http://localhost:8000/rebuild" -H "Content-Type: application/json" -d "{\"index_type\": \"hnsw\", \"limit\": 50}"
 ```
 
 #### Requête cURL `/rebuild` (via corps JSON) :
 ```bash
+# Linux / macOS / Git Bash :
 curl -X POST "http://localhost:8000/rebuild" \
   -H "Content-Type: application/json" \
   -d '{
@@ -233,6 +235,10 @@ curl -X POST "http://localhost:8000/rebuild" \
     "password": "le_mot_de_passe",
     "limit": 50
   }'
+
+# Windows PowerShell (natif Invoke-RestMethod) :
+$body = @{ index_type = "hnsw"; user = "admin"; password = "le_mot_de_passe"; limit = 50 } | ConvertTo-Json
+Invoke-RestMethod -Uri "http://localhost:8000/rebuild" -Method Post -ContentType "application/json" -Body $body
 ```
 
 #### Réponse JSON `/ask` :
