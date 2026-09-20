@@ -32,7 +32,21 @@ for _path_item in (str(_root_dir), str(_root_dir / "src"), str(_current_dir)):
     if _path_item not in sys.path:
         sys.path.insert(0, _path_item)
 
+import logging
 import secrets
+
+# Configuration du logger pour l'affichage des logs de traitement dans la console et Docker
+logger = logging.getLogger("rag.api")
+if not logger.handlers:
+    _console_handler = logging.StreamHandler(sys.stdout)
+    _console_formatter = logging.Formatter(
+        fmt="%(asctime)s [%(levelname)s] [RAG] %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    _console_handler.setFormatter(_console_formatter)
+    logger.addHandler(_console_handler)
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -344,11 +358,12 @@ async def ask_question(
             detail="La question ne peut pas être vide ou composée uniquement d'espaces.",
         )
 
+    logger.info(f"📥 [POST /ask] Question reçue (top_k={payload.top_k}) : \"{cleaned_q}\"")
     t0 = time.perf_counter()
     try:
         res = bot.ask(cleaned_q, k=payload.top_k)
     except Exception as exc:
-        # Protection anti-fuite d'informations sensibles (clés d'API, etc.)
+        logger.error(f"❌ [POST /ask] Erreur lors du traitement RAG : {str(exc)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Erreur lors du traitement de la requête RAG : {str(exc)}",
@@ -365,6 +380,16 @@ async def ask_question(
         )
         for s in res.get("sources", [])
     ]
+
+    logger.info(
+        f"✅ [POST /ask] Réponse générée en {latency:.2f}s | {len(sources_out)} source(s) retenue(s)"
+    )
+    for idx, s in enumerate(sources_out[:3], 1):
+        logger.info(
+            f"   ↳ #{idx} : {s.titre} ({s.ville}) [score distance={s.score_distance:.4f}]"
+        )
+    if len(sources_out) > 3:
+        logger.info(f"   ↳ ... et {len(sources_out) - 3} autre(s) source(s)")
 
     return AnswerResponse(
         question=cleaned_q,
@@ -450,15 +475,22 @@ async def rebuild_post(
             detail="Seul le modèle d'index 'hnsw' est autorisé pour la reconstruction.",
         )
 
+    limit_val = payload.limit if payload else None
+    logger.info(f"🔄 [POST /rebuild] Demande de reconstruction reçue (utilisateur='{provided_user}', limit={limit_val or 'tous'})...")
     try:
-        limit_val = payload.limit if payload else None
         is_mock = getattr(bot, "index_path", None) == Path("mock_index")
+        t_rebuild = time.perf_counter()
         if not is_mock:
+            logger.info("📡 [POST /rebuild] Étape 1/2 : Récupération des événements depuis OpenAgenda et calcul des embeddings...")
             reconstruire_index_hnsw(limit=limit_val)
+            logger.info("💾 [POST /rebuild] Étape 2/2 : Rechargement à chaud de la base vectorielle FAISS HNSW en mémoire...")
             ntotal = bot.reload_index(index_dir="hnsw")
         else:
+            logger.info("🧪 [POST /rebuild] [Test Mode] Rechargement de l'index mock...")
             ntotal = bot.reload_index()
 
+        rebuild_duration = time.perf_counter() - t_rebuild
+        logger.info(f"🎉 [POST /rebuild] Reconstruction terminée avec succès en {rebuild_duration:.2f}s ({ntotal} événements indexés)")
         stats = bot.get_stats()
         return RebuildResponse(
             status="success",
@@ -468,6 +500,7 @@ async def rebuild_post(
             timestamp=datetime.now().isoformat(),
         )
     except Exception as exc:
+        logger.error(f"❌ [POST /rebuild] Erreur lors de la reconstruction de la base vectorielle : {str(exc)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Erreur lors de la reconstruction de la base vectorielle : {str(exc)}",

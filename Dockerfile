@@ -26,6 +26,7 @@ RUN uv sync --frozen --no-install-project
 COPY main.py ./
 COPY src/__init__.py ./src/__init__.py
 COPY src/chatbot.py ./src/chatbot.py
+COPY src/creer_index_hnsw.py ./src/creer_index_hnsw.py
 COPY src/api.py ./src/api.py
 COPY src/static/ui-chatbot.html ./src/static/ui-chatbot.html
 COPY src/mon_index_langchain_evenements_hnsw_rapide/index.faiss ./src/mon_index_langchain_evenements_hnsw_rapide/index.faiss
@@ -41,4 +42,4 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
-CMD ["uvicorn", "src.api:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.api:app", "--host", "0.0.0.0", "--port", "8000", "--log-level", "info", "--access-log"]

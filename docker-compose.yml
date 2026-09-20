@@ -10,8 +10,11 @@ services:
     env_file:
       - .env
     environment:
+      - PYTHONUNBUFFERED=1
       - HOST=0.0.0.0
       - PORT=8000
+    tty: true
+    stdin_open: true
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
